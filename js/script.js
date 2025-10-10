@@ -26,3 +26,4 @@ document.addEventListener('click', (e) => {
     if (!clickDentro) barraLateral.classList.remove('active');
   }
 });
+
