@@ -32,13 +32,25 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Gabino gif
- const imagen = document.getElementById('miImagen');
-    let contadorClicks = 0;
 
-    imagen.addEventListener('click', () => {
-      contadorClicks++;
-      if (contadorClicks === 5) {
-        imagen.src = 'img/Gabino-gif.gif'; // Cambia 'tuGif.gif' por el nombre real
-      }
-    });
+    // Gabino gif
+document.addEventListener("DOMContentLoaded", () => {
+  const imagen = document.getElementById('miImagen');
+  let contadorClicks = 0;
+
+  const gif = new Image();
+  gif.src = 'img/Gabino-gif.gif';
+
+  imagen.style.borderRadius = '50%';
+  imagen.style.objectFit = 'cover';
+  imagen.style.width = '150px';
+  imagen.style.height = '150px';
+
+  
+  imagen.addEventListener('click', () => {
+    contadorClicks++;
+    if (contadorClicks === 5) {
+      imagen.src = gif.src; 
+    }
+  });
+});

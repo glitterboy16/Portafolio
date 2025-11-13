@@ -398,10 +398,21 @@ main {
     font-size: 1rem;
   }
 
-  .foto-perfil img {
+  /* .foto-perfil img {
     width: 90px;
-  }
+  } */
 
+  .foto-perfil img {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 150px;
+  height: 150px;
+  transition: transform 0.2s ease;
+}
+
+.foto-perfil img:active {
+  transform: scale(0.97);
+}
   .enlace-nav {
     font-size: 1rem;
     padding: var(--spacing-2) var(--spacing-4);
