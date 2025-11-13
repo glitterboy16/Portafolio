@@ -31,3 +31,14 @@ document.addEventListener('click', (e) => {
     if (!clickDentro) barraLateral.classList.remove('active');
   }
 });
+
+// Gabino gif
+ const imagen = document.getElementById('miImagen');
+    let contadorClicks = 0;
+
+    imagen.addEventListener('click', () => {
+      contadorClicks++;
+      if (contadorClicks === 5) {
+        imagen.src = 'img/Gabino-gif.gif'; // Cambia 'tuGif.gif' por el nombre real
+      }
+    });
