@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Color — casi negro tintado hacia el violeta de la marca */
+  --color-fondo: oklch(0.14 0.008 295);
+  --color-superficie: oklch(0.175 0.01 295);
+  --color-superficie-alta: oklch(0.205 0.012 295);
+  --color-texto: oklch(0.94 0.008 295);
+  --color-texto-2: oklch(0.68 0.015 295);
+  --color-texto-3: oklch(0.54 0.015 295);
+  --color-acento: oklch(0.76 0.11 300);
+  --color-borde: oklch(0.98 0.005 295 / 0.08);
+  --color-borde-fuerte: oklch(0.98 0.005 295 / 0.16);
+
+  /* Tipografía */
+  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+  /* Movimiento */
+  --ease-suave: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-entrada: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-aparecer: aparecer 650ms var(--ease-entrada) both;
+  --animate-tooltip: tooltip 180ms var(--ease-suave) both;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tooltip {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@layer base {
+  html {
+    scrollbar-color: oklch(0.35 0.01 295) transparent;
+  }
+
+  body {
+    background: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    font-kerning: normal;
+  }
+
+  ::selection {
+    background: var(--color-acento);
+    color: oklch(0.16 0.02 295);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-acento);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
