@@ -8,7 +8,13 @@ export const PERFIL = {
     'Últimamente construyo productos reales para negocios de hostelería: cartas digitales y webs que sus dueños pueden gestionar solos, sin depender de nadie.',
   ],
   contacto: [
-    { etiqueta: 'Email', valor: 'villorinaangelandres@gmail.com', href: 'mailto:villorinaangelandres@gmail.com' },
+    {
+      etiqueta: 'Email',
+      valor: 'villorinaangelandres@gmail.com',
+      href: 'mailto:villorinaangelandres@gmail.com',
+      // El más largo: en rejilla horizontal ocupa dos columnas para no partirse
+      ancho: true,
+    },
     { etiqueta: 'Teléfono', valor: '+34 641 565 926', href: 'tel:+34641565926' },
     { etiqueta: 'Cumpleaños', valor: '16 de septiembre, 2003' },
     { etiqueta: 'Ubicación', valor: 'Mérida, España' },

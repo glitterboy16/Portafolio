@@ -18,6 +18,14 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300..800&display=swap"
     />
+    <script>
+      // Fija el tema antes del primer pintado para que no haya destello blanco.
+      (() => {
+        const guardado = localStorage.getItem('tema');
+        const preferido = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = guardado || preferido;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

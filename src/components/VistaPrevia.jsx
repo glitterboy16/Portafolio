@@ -52,7 +52,7 @@ export default function VistaPrevia({ url, nombre, proporcion = 16 / 10 }) {
     <div
       ref={contenedor}
       style={{ aspectRatio: proporcion }}
-      className="relative w-full overflow-hidden rounded-xl border border-borde bg-superficie-alta"
+      className="relative w-full overflow-hidden rounded-[clamp(0.75rem,1.5vw,1rem)] border border-borde bg-fondo-2 shadow-[0_10px_30px_-14px_var(--c-sombra)]"
     >
       {visible && (
         <iframe
@@ -77,14 +77,12 @@ export default function VistaPrevia({ url, nombre, proporcion = 16 / 10 }) {
       )}
 
       {/* Mientras carga: latido sutil en lugar de un hueco vacío */}
-      {!cargado && (
-        <div className="absolute inset-0 animate-pulse bg-superficie-alta" aria-hidden="true" />
-      )}
+      {!cargado && <div className="absolute inset-0 animate-pulse bg-fondo-2" aria-hidden="true" />}
 
-      {/* Velo que oscurece ligeramente la web y se levanta al pasar el ratón */}
+      {/* Velo que atenúa la web y se levanta al pasar el ratón por la tarjeta */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-fondo/25 transition-colors duration-500 ease-suave group-hover:bg-transparent"
+        className="absolute inset-0 bg-fondo/20 transition-opacity duration-500 ease-suave group-hover:opacity-0"
       />
     </div>
   );
