@@ -27,6 +27,9 @@ uniform vec2 resolucion;
 uniform float tiempo;
 uniform vec3 tinta;
 uniform float escala;
+uniform float contraste;
+uniform sampler2D imagen;
+uniform bool hayImagen;
 
 // Ruido de valor: hash por celda e interpolación suave entre esquinas
 float hash(vec2 p) {
@@ -80,19 +83,36 @@ void main() {
   vec2 uv = pixel * escala / resolucion;
   float proporcion = resolucion.x / resolucion.y;
 
-  // El campo se arrastra en diagonal: el viento sopla siempre hacia un lado
-  vec2 d = vec2(uv.x * proporcion * 2.6 - tiempo * 1.6, uv.y * 3.4 + tiempo * 0.55);
+  float intensidad;
 
-  // Distorsionar el dominio con otro ruido es lo que ondula el tejido
-  float deforma = fbm(d * 0.7 + vec2(4.2, -1.7));
-  float campo = fbm(d + deforma * vec2(1.9, 1.3));
+  if (hayImagen) {
+    // Con imagen de fondo, es ella la que pone la forma: se lee su
+    // luminancia y se agita con ruido, de modo que la materia sea real
+    // y el movimiento, calculado.
+    vec2 vaiven = vec2(
+      fbm(uv * 2.4 + vec2(tiempo * 0.9, 0.0)) - 0.5,
+      fbm(uv * 2.4 + vec2(0.0, tiempo * 0.6 + 7.3)) - 0.5
+    ) * 0.035;
 
-  // Doblar el campo sobre sí mismo marca las crestas del pliegue
-  campo = 1.0 - abs(campo - 0.5) * 2.0;
+    vec3 muestra = texture2D(imagen, vec2(uv.x, 1.0 - uv.y) + vaiven).rgb;
+    float luz = dot(muestra, vec3(0.299, 0.587, 0.114));
+    intensidad = clamp((luz - 0.5) * contraste + 0.5, 0.0, 1.0);
+  } else {
+    // Sin imagen, la forma se genera: el campo se arrastra en diagonal,
+    // como si el viento soplara siempre hacia el mismo lado.
+    vec2 d = vec2(uv.x * proporcion * 2.6 - tiempo * 1.6, uv.y * 3.4 + tiempo * 0.55);
 
-  // La tela se desvanece hacia arriba y hacia abajo
-  float velo = sin(3.14159 * clamp(uv.y * 1.12, 0.0, 1.0));
-  float intensidad = clamp((campo * velo - 0.42) * 2.6, 0.0, 1.0);
+    // Distorsionar el dominio con otro ruido es lo que ondula el tejido
+    float deforma = fbm(d * 0.7 + vec2(4.2, -1.7));
+    float campo = fbm(d + deforma * vec2(1.9, 1.3));
+
+    // Doblar el campo sobre sí mismo marca las crestas del pliegue
+    campo = 1.0 - abs(campo - 0.5) * 2.0;
+
+    // La tela se desvanece hacia arriba y hacia abajo
+    float velo = sin(3.14159 * clamp(uv.y * 1.12, 0.0, 1.0));
+    intensidad = clamp((campo * velo - 0.42) * contraste, 0.0, 1.0);
+  }
 
   float encendido = step(bayer(pixel), intensidad);
   gl_FragColor = vec4(tinta, encendido);
@@ -118,7 +138,14 @@ function compilar(gl, tipo, fuente) {
   return shader;
 }
 
-export default function FondoFluido({ escala = 3, className = '' }) {
+/**
+ * @param {number} escala - lado del punto de la trama, en píxeles
+ * @param {string} [imagen] - ruta a una imagen propia que haga de materia.
+ *   Sin ella el fondo se genera con ruido; con ella se trama la imagen, que es
+ *   como se consiguen formas de humo o tela creíbles.
+ * @param {number} contraste - cuánto se separan luces y sombras antes de tramar
+ */
+export default function FondoFluido({ escala = 3, imagen, contraste = 3.1, className = '' }) {
   const refLienzo = useRef(null);
 
   useEffect(() => {
@@ -158,10 +185,38 @@ export default function FondoFluido({ escala = 3, className = '' }) {
     const uTiempo = gl.getUniformLocation(programa, 'tiempo');
     const uTinta = gl.getUniformLocation(programa, 'tinta');
     const uEscala = gl.getUniformLocation(programa, 'escala');
+    const uContraste = gl.getUniformLocation(programa, 'contraste');
+    const uImagen = gl.getUniformLocation(programa, 'imagen');
+    const uHayImagen = gl.getUniformLocation(programa, 'hayImagen');
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.uniform1f(uEscala, escala);
+    gl.uniform1f(uContraste, contraste);
+    gl.uniform1i(uHayImagen, 0);
+
+    // La imagen, si la hay, entra como textura en cuanto termina de cargar
+    let textura = null;
+    let anulado = false;
+    if (imagen) {
+      const foto = new Image();
+      foto.crossOrigin = 'anonymous';
+      foto.onload = () => {
+        if (anulado) return;
+        textura = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, textura);
+        // Sin mipmaps y con borde fijado: la imagen no tiene por qué medir
+        // una potencia de dos, y así WebGL 1 la acepta igual.
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, foto);
+        gl.useProgram(programa);
+        gl.uniform1i(uImagen, 0);
+        gl.uniform1i(uHayImagen, 1);
+      };
+      foto.src = imagen;
+    }
 
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let cuadro = 0;
@@ -189,6 +244,10 @@ export default function FondoFluido({ escala = 3, className = '' }) {
     const pintar = (ms) => {
       gl.useProgram(programa);
       gl.uniform1f(uTiempo, ms * 0.00006);
+      if (textura) {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, textura);
+      }
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -220,21 +279,23 @@ export default function FondoFluido({ escala = 3, className = '' }) {
     });
 
     return () => {
+      anulado = true;
       cancelAnimationFrame(cuadro);
       observador.disconnect();
       vigilante.disconnect();
+      if (textura) gl.deleteTexture(textura);
       gl.deleteProgram(programa);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
       gl.deleteBuffer(buffer);
     };
-  }, [escala]);
+  }, [escala, imagen, contraste]);
 
   return (
     <canvas
       ref={refLienzo}
       aria-hidden="true"
-      className={`pointer-events-none size-full opacity-45 ${className}`}
+      className={`pointer-events-none size-full opacity-70 ${className}`}
     />
   );
 }
