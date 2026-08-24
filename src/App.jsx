@@ -10,9 +10,9 @@ import Pie from './components/Pie';
 import { useTema, useScrollSuave, useSeccionVisible } from './hooks';
 
 const SECCIONES = [
-  { id: 'sobre-mi', etiqueta: 'Sobre mí' },
-  { id: 'proyectos', etiqueta: 'Proyectos' },
-  { id: 'precios', etiqueta: 'Precios' },
+  { id: 'sobre-mi', etiqueta: { es: 'Sobre mí', en: 'About' } },
+  { id: 'proyectos', etiqueta: { es: 'Proyectos', en: 'Work' } },
+  { id: 'precios', etiqueta: { es: 'Precios', en: 'Pricing' } },
 ];
 
 export default function App() {

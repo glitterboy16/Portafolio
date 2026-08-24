@@ -50,9 +50,12 @@ export const TECNOLOGIAS = {
   vscode: { nombre: 'VS Code', svg: vscode },
   n8n: deSimple(siN8n),
   claude: deSimple(siClaude),
-  // Antigravity es demasiado reciente para estar en devicon o simple-icons;
-  // hasta que Angel pase el SVG oficial, va con monograma.
-  antigravity: { nombre: 'Antigravity', sigla: 'Ag', color: '#4285F4' },
+  // Antigravity aún no está en devicon ni en simple-icons: se usa la marca
+  // oficial de antigravity.google, servida desde public/.
+  antigravity: {
+    nombre: 'Antigravity',
+    imagen: `${import.meta.env.BASE_URL}antigravity.png`,
+  },
 };
 
 /** Orden en que aparecen en la sección de habilidades. */

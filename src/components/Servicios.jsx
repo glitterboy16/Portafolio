@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Cabecera from './Cabecera';
 import { PLANES, NOTA_PRECIOS } from '../data/planes';
 import { useFoco } from '../hooks';
+import { useIdioma } from '../idioma';
 
 function Check() {
   return (
@@ -23,37 +24,48 @@ export default function Servicios() {
   const [activo, setActivo] = useState(PLANES[1].id);
   const plan = PLANES.find((p) => p.id === activo);
   const foco = useFoco();
+  const { t } = useIdioma();
 
-  const asunto = encodeURIComponent(`Presupuesto — plan ${plan.nombre}`);
+  const asunto = encodeURIComponent(
+    t({ es: `Presupuesto — plan ${t(plan.nombre)}`, en: `Quote — ${t(plan.nombre)} plan` }),
+  );
   const cuerpo = encodeURIComponent(
-    `Hola Angel:\n\nMe interesa el plan ${plan.nombre} para mi proyecto.\n\nEsto es lo que necesito:\n`,
+    t({
+      es: `Hola Angel:\n\nMe interesa el plan ${t(plan.nombre)} para mi proyecto.\n\nEsto es lo que necesito:\n`,
+      en: `Hi Angel,\n\nI'm interested in the ${t(plan.nombre)} plan for my project.\n\nHere's what I need:\n`,
+    }),
   );
 
   return (
     <section id="precios" className="scroll-mt-24 py-[clamp(3rem,6vw,5rem)]">
-      <Cabecera sobretitulo="Servicios" titulo="Un precio claro desde el principio." />
+      <Cabecera
+        sobretitulo={t({ es: 'Servicios', en: 'Services' })}
+        titulo={t({ es: 'Un precio claro desde el principio.', en: 'A clear price from the start.' })}
+      />
 
-      <p className="animate-aparecer mb-2 max-w-[58ch] text-[clamp(0.95rem,1.6vw,1.0625rem)] text-texto-2 [animation-delay:300ms]">
-        Sin cuotas mensuales ni letra pequeña. Eliges el alcance, te paso el presupuesto cerrado y
-        empezamos.
+      <p className="mb-2 max-w-[58ch] text-[clamp(0.95rem,1.6vw,1.0625rem)] text-texto-2">
+        {t({
+          es: 'Sin cuotas mensuales ni letra pequeña. Eliges el alcance, te paso el presupuesto cerrado y empezamos.',
+          en: 'No monthly fees, no fine print. You choose the scope, I send a fixed quote, and we start.',
+        })}
       </p>
-      <p className="animate-aparecer mb-8 max-w-[58ch] text-xs text-texto-3 [animation-delay:340ms]">
-        {NOTA_PRECIOS}
-      </p>
+      <p className="mb-8 max-w-[58ch] text-xs text-texto-3">{t(NOTA_PRECIOS)}</p>
 
       <div
         {...foco}
-        className="vidrio foco animate-aparecer relative mx-auto mt-14 max-w-[30rem] rounded-2xl p-[clamp(1.25rem,3vw,1.75rem)] [animation-delay:400ms]"
+        className="vidrio foco relative mx-auto mt-14 max-w-[30rem] rounded-2xl p-[clamp(1.25rem,3vw,1.75rem)]"
       >
         {/* Pestaña que sobresale, como la etiqueta de una carpeta */}
         <div className="-mt-[calc(clamp(1.25rem,3vw,1.75rem)+1.6rem)] mb-5 flex justify-center">
-          <span className="solido rounded-lg px-4 py-2 text-[0.7rem]">Desarrollo web a medida</span>
+          <span className="solido rounded-lg px-4 py-2 text-[0.7rem]">
+            {t({ es: 'Desarrollo web a medida', en: 'Custom web development' })}
+          </span>
         </div>
 
         {/* Selector de plan */}
         <div
           role="tablist"
-          aria-label="Planes"
+          aria-label={t({ es: 'Planes', en: 'Plans' })}
           className="mb-6 grid grid-cols-3 gap-1 rounded-xl border border-borde bg-fondo-2/60 p-1"
         >
           {PLANES.map((p) => (
@@ -68,14 +80,14 @@ export default function Servicios() {
                   : 'text-texto-2 hover:bg-borde hover:text-texto'
               }`}
             >
-              {p.nombre}
+              {t(p.nombre)}
             </button>
           ))}
         </div>
 
         {/* El precio y todo lo que cambia con él */}
         <div key={plan.id} className="animate-aparecer">
-          <p className="mb-4 text-sm text-texto-2">{plan.resumen}</p>
+          <p className="mb-4 text-sm text-texto-2">{t(plan.resumen)}</p>
 
           <div className="mb-1 flex flex-wrap items-baseline gap-x-2">
             <span className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold leading-none tracking-[-0.04em]">
@@ -87,13 +99,15 @@ export default function Servicios() {
             </span>
             <span className="text-sm text-texto-3">USD</span>
           </div>
-          <p className="marbete mb-6">Entrega estimada {plan.entrega}</p>
+          <p className="marbete mb-6">
+            {t({ es: 'Entrega estimada', en: 'Estimated delivery' })} {t(plan.entrega)}
+          </p>
 
           <ul className="mb-7 flex flex-col gap-2.5">
-            {plan.incluye.map((punto) => (
-              <li key={punto} className="flex items-start gap-2.5 text-sm text-texto-2">
+            {plan.incluye.map((punto, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm text-texto-2">
                 <Check />
-                <span>{punto}</span>
+                <span>{t(punto)}</span>
               </li>
             ))}
           </ul>
@@ -102,10 +116,10 @@ export default function Servicios() {
             href={`mailto:villorinaangelandres@gmail.com?subject=${asunto}&body=${cuerpo}`}
             className="solido block rounded-xl px-5 py-3.5 text-center text-[0.8125rem]"
           >
-            Pedir presupuesto
+            {t({ es: 'Pedir presupuesto', en: 'Request a quote' })}
           </a>
           <p className="mt-3 text-center text-xs text-texto-3">
-            Respondo en menos de 24 h · Sin compromiso
+            {t({ es: 'Respondo en menos de 24 h · Sin compromiso', en: 'I reply within 24h · No commitment' })}
           </p>
         </div>
       </div>

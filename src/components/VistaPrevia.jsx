@@ -20,14 +20,17 @@ export default function VistaPrevia({ url, nombre, proporcion = 16 / 10 }) {
     const nodo = contenedor.current;
     if (!nodo) return;
 
+    // El iframe se monta al acercarse y, sobre todo, se DESMONTA al alejarse.
+    // Dentro corren sitios completos con su propio JavaScript, y basta con que
+    // uno reintente una conexión caída en bucle para hundir los fotogramas de
+    // esta página. Descargándolo, ese coste sólo existe mientras se está
+    // mirando la tarjeta.
     const observador = new IntersectionObserver(
       ([entrada]) => {
-        if (entrada.isIntersecting) {
-          setVisible(true);
-          observador.disconnect();
-        }
+        setVisible(entrada.isIntersecting);
+        if (!entrada.isIntersecting) setCargado(false);
       },
-      { rootMargin: '200px' },
+      { rootMargin: '300px' },
     );
 
     observador.observe(nodo);

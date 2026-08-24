@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import Cabecera from './Cabecera';
 import IconoTecnologia from './IconoTecnologia';
+import CarruselTecnologias from './CarruselTecnologias';
 import { PERFIL } from '../data/perfil';
 import { HABILIDADES } from '../data/tecnologias';
 import { useRevelar } from '../hooks';
+import { useIdioma } from '../idioma';
 
 /** Dato suelto en una celda de la rejilla, con su rótulo encima. */
 function Dato({ rotulo, children, ancho = false }) {
@@ -19,33 +21,40 @@ export default function SobreMi() {
   const [clicks, setClicks] = useState(0);
   const bloque = useRevelar();
   const rejilla = useRevelar({ retraso: 0.1 });
+  const { t } = useIdioma();
   const foto = clicks >= 5 ? PERFIL.gif : PERFIL.foto;
 
   return (
     <section id="sobre-mi" className="scroll-mt-24 py-[clamp(3rem,6vw,5rem)]">
-      <Cabecera sobretitulo="Sobre mí" titulo="Estudio de desarrollo de una sola persona." />
+      <Cabecera
+        sobretitulo={t({ es: 'Sobre mí', en: 'About me' })}
+        titulo={t({ es: 'Desarrollador freelance.', en: 'Freelance developer.' })}
+      />
 
       <div ref={bloque} className="grid gap-[clamp(1.5rem,4vw,3rem)] lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div>
           <div className="max-w-[58ch] text-[clamp(1rem,1.8vw,1.15rem)] text-texto-2">
             {PERFIL.presentacion.map((parrafo, i) => (
               <p key={i} className={i > 0 ? 'mt-4' : undefined}>
-                {parrafo}
+                {t(parrafo)}
               </p>
             ))}
           </div>
 
           <div className="mt-[clamp(2rem,4vw,3rem)] grid gap-1 sm:grid-cols-2">
-            {PERFIL.servicios.map(({ titulo, descripcion }) => (
-              <div key={titulo} className="bg-vidrio p-5">
-                <h3 className="mb-1 font-medium tracking-[-0.01em]">{titulo}</h3>
-                <p className="text-sm text-texto-2">{descripcion}</p>
+            {PERFIL.servicios.map(({ titulo, descripcion }, i) => (
+              <div
+                key={i}
+                className={`bg-vidrio p-5 ${i === PERFIL.servicios.length - 1 && PERFIL.servicios.length % 2 !== 0 ? 'sm:col-span-2' : ''}`}
+              >
+                <h3 className="mb-1 font-medium tracking-[-0.01em]">{t(titulo)}</h3>
+                <p className="text-sm text-texto-2">{t(descripcion)}</p>
               </div>
             ))}
           </div>
 
-          {[...PERFIL.experiencia, ...PERFIL.educacion].map(({ titulo, fecha, descripcion, href }) => (
-            <div key={titulo} className="mt-1 bg-vidrio p-5">
+          {[...PERFIL.experiencia, ...PERFIL.educacion].map(({ titulo, fecha, descripcion, href }, i) => (
+            <div key={i} className="mt-1 bg-vidrio p-5">
               <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-4">
                 <h3 className="font-medium tracking-[-0.01em]">
                   {href ? (
@@ -55,15 +64,15 @@ export default function SobreMi() {
                       rel="noreferrer"
                       className="underline-offset-4 transition-colors duration-200 ease-suave hover:text-acento hover:underline"
                     >
-                      {titulo}
+                      {t(titulo)}
                     </a>
                   ) : (
-                    titulo
+                    t(titulo)
                   )}
                 </h3>
-                <span className="marbete">{fecha}</span>
+                <span className="marbete">{t(fecha)}</span>
               </div>
-              <p className="max-w-[58ch] text-sm text-texto-2">{descripcion}</p>
+              <p className="max-w-[58ch] text-sm text-texto-2">{t(descripcion)}</p>
             </div>
           ))}
         </div>
@@ -81,18 +90,18 @@ export default function SobreMi() {
             />
             <figcaption className="absolute inset-x-0 bottom-0 bg-fondo/70 px-4 py-3 backdrop-blur-md">
               <p className="text-sm font-medium">{PERFIL.nombre}</p>
-              <p className="text-xs text-texto-2">{PERFIL.cargo}</p>
+              <p className="text-xs text-texto-2">{t(PERFIL.cargo)}</p>
             </figcaption>
           </figure>
 
-          {PERFIL.contacto.map(({ etiqueta, valor, href, ancho }) => (
-            <Dato key={etiqueta} rotulo={etiqueta} ancho={ancho}>
+          {PERFIL.contacto.map(({ etiqueta, valor, href, ancho }, i) => (
+            <Dato key={i} rotulo={t(etiqueta)} ancho={ancho}>
               {href ? (
                 <a href={href} className="transition-colors duration-200 ease-suave hover:text-acento">
-                  {valor}
+                  {t(valor)}
                 </a>
               ) : (
-                valor
+                t(valor)
               )}
             </Dato>
           ))}
@@ -100,8 +109,15 @@ export default function SobreMi() {
       </div>
 
       <div ref={rejilla} className="mt-[clamp(2.5rem,5vw,4rem)]">
-        <p className="marbete mb-3">Con lo que trabajo</p>
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1">
+        <p className="marbete mb-3">{t({ es: 'Con lo que trabajo', en: 'What I work with' })}</p>
+
+        {/* En pantallas estrechas la rejilla alargaba muchísimo la página, así
+            que el mismo contenido desfila en una sola tira. */}
+        <div className="sm:hidden">
+          <CarruselTecnologias claves={HABILIDADES} />
+        </div>
+
+        <ul className="hidden grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1 sm:grid">
           {HABILIDADES.map((clave) => (
             <li key={clave}>
               <IconoTecnologia clave={clave} tamano={38} conEtiqueta celda />

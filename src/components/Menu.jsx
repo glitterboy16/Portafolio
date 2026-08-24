@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { gsap, quieto } from '../gsap';
 import { PERFIL } from '../data/perfil';
+import { useIdioma } from '../idioma';
 
 /**
  * Panel de navegación a pantalla completa.
@@ -15,6 +16,7 @@ export default function Menu({ abierto, secciones, activa, onIr }) {
   const filas = useRef([]);
   const pie = useRef(null);
   const linea = useRef(null);
+  const { t } = useIdioma();
 
   useLayoutEffect(() => {
     const nodo = raiz.current;
@@ -26,13 +28,14 @@ export default function Menu({ abierto, secciones, activa, onIr }) {
         return;
       }
 
-      const t = gsap.timeline({ defaults: { ease: 'salida' } });
+      const linea_ = linea.current;
+      const t_ = gsap.timeline({ defaults: { ease: 'salida' } });
 
       if (abierto) {
         gsap.set(nodo, { autoAlpha: 1, pointerEvents: 'auto' });
-        t.fromTo(telon.current, { yPercent: 100 }, { yPercent: 0, duration: 0.72 })
+        t_.fromTo(telon.current, { yPercent: 100 }, { yPercent: 0, duration: 0.72 })
           .fromTo(
-            linea.current,
+            linea_,
             { scaleX: 0 },
             { scaleX: 1, duration: 0.7, transformOrigin: 'left center' },
             '-=0.32',
@@ -45,7 +48,7 @@ export default function Menu({ abierto, secciones, activa, onIr }) {
           )
           .fromTo(pie.current, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.35');
       } else {
-        t.to(filas.current, { yPercent: -60, opacity: 0, duration: 0.3, stagger: 0.03 })
+        t_.to(filas.current, { yPercent: -60, opacity: 0, duration: 0.3, stagger: 0.03 })
           .to(pie.current, { opacity: 0, duration: 0.2 }, 0)
           .to(telon.current, { yPercent: 100, duration: 0.45, ease: 'entrada' }, '-=0.1')
           .set(nodo, { autoAlpha: 0, pointerEvents: 'none' });
@@ -84,7 +87,7 @@ export default function Menu({ abierto, secciones, activa, onIr }) {
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="text-[clamp(1.9rem,8vw,2.6rem)] font-medium leading-none tracking-[-0.03em]">
-                    {etiqueta}
+                    {t(etiqueta)}
                   </span>
                   {activa === id && (
                     <span aria-hidden="true" className="ml-auto size-2 shrink-0 self-center bg-solido" />
@@ -97,7 +100,7 @@ export default function Menu({ abierto, secciones, activa, onIr }) {
 
         <div ref={pie} className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="marbete mb-2">Hablemos</p>
+            <p className="marbete mb-2">{t({ es: 'Hablemos', en: 'Say hello' })}</p>
             <a
               href="mailto:villorinaangelandres@gmail.com"
               className="text-sm underline-offset-4 hover:underline"

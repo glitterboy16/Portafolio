@@ -14,8 +14,8 @@ function aislarIds(svg, sufijo) {
 }
 
 /**
- * Icono de tecnología: gris en reposo, a su color al pasar por encima o al
- * enfocarlo. En móvil el nombre se abre como aviso al tocarlo.
+ * Icono de tecnología, siempre con sus colores de marca. Al pasar por encima
+ * se levanta un poco; en móvil el nombre se abre como aviso al tocarlo.
  */
 export default function IconoTecnologia({ clave, tamano = 22, conEtiqueta = false, celda = false }) {
   const tecnologia = TECNOLOGIAS[clave];
@@ -45,50 +45,56 @@ export default function IconoTecnologia({ clave, tamano = 22, conEtiqueta = fals
 
   if (!tecnologia) return null;
 
-  const { nombre, path, color, sigla } = tecnologia;
+  const { nombre, path, color, imagen, sigla } = tecnologia;
   const activo = sobre || abierto;
 
-  const comun = `shrink-0 transition-[filter,color,transform] duration-300 ease-suave ${
-    activo ? 'scale-110' : ''
-  }`;
+  const comun = `shrink-0 transition-transform duration-300 ease-suave ${activo ? 'scale-110' : ''}`;
 
   let icono;
   if (svgAislado) {
-    // devicon: a todo color, se apaga con un filtro
+    // devicon: el SVG trae sus colores puestos
     icono = (
       <span
         aria-hidden="true"
         dangerouslySetInnerHTML={{ __html: svgAislado }}
         style={{ width: tamano, height: tamano }}
-        className={`inline-flex [&>svg]:size-full ${comun} ${
-          activo ? 'grayscale-0 opacity-100' : 'opacity-55 grayscale'
-        }`}
+        className={`inline-flex [&>svg]:size-full ${comun}`}
+      />
+    );
+  } else if (imagen) {
+    // Marca que sólo existe como imagen (Antigravity)
+    icono = (
+      <img
+        src={imagen}
+        alt=""
+        width={tamano}
+        height={tamano}
+        loading="lazy"
+        style={{ width: tamano, height: tamano }}
+        className={`object-contain ${comun}`}
       />
     );
   } else if (path) {
-    // simple-icons: un solo trazado, se le da su color de marca
+    // simple-icons: un solo trazado, siempre con su color de marca
     icono = (
       <svg
         viewBox="0 0 24 24"
         aria-hidden="true"
         width={tamano}
         height={tamano}
-        fill="currentColor"
-        style={{ color: activo ? color : undefined }}
-        className={`${comun} ${activo ? '' : 'text-texto-3'}`}
+        fill={color}
+        className={comun}
       >
         <path d={path} />
       </svg>
     );
   } else {
-    // Sin icono en ninguna librería: monograma con el peso de los demás
+    // Sin marca en ninguna parte: monograma con el peso de los demás
     icono = (
       <span
         aria-hidden="true"
-        style={{ width: tamano, height: tamano, color: activo ? color : undefined }}
-        className={`inline-grid place-items-center rounded-[0.2em] border border-current text-[0.55em] font-bold leading-none ${comun} ${
-          activo ? '' : 'text-texto-3'
-        }`}
+        style={{ width: tamano, height: tamano, color }}
+        className={`inline-grid place-items-center rounded-[0.2em] border border-current text-[0.55em] font-bold leading-none ${comun}`}
       >
         {sigla}
       </span>

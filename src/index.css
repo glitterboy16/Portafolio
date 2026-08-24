@@ -37,8 +37,9 @@
   --c-grano: 0.05;
 
   /* Sólidos planos: el acento se usa como tinta, sin degradados */
-  --c-solido: oklch(0.5 0.21 300);
-  --c-solido-texto: oklch(0.98 0.005 300);
+  /* Oscurecido hasta superar 4.5:1 con su texto: a 0.5 se quedaba en 3.89 */
+  --c-solido: oklch(0.44 0.2 300);
+  --c-solido-texto: oklch(0.99 0.004 300);
 }
 
 /* ============================================================
@@ -66,8 +67,8 @@
   --c-velo: oklch(0.14 0.006 300);
   --c-grano: 0.09;
 
-  --c-solido: oklch(0.62 0.22 300);
-  --c-solido-texto: oklch(0.99 0.005 300);
+  --c-solido: oklch(0.55 0.22 300);
+  --c-solido-texto: oklch(0.99 0.004 300);
 }
 
 @theme inline {
@@ -115,6 +116,18 @@
   to {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Desfile continuo del carrusel. La lista va duplicada, así que recorrer la
+   mitad exacta devuelve el contenido a un punto idéntico al de partida y el
+   bucle no tiene costura. */
+@keyframes desfilar {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
   }
 }
 
