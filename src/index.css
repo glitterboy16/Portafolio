@@ -232,6 +232,13 @@
     opacity: 1;
   }
 
+  /* SplitText envuelve cada línea con esta clase: recortar aquí es lo que
+     permite que las palabras suban desde detrás del renglón. */
+  .linea-recorte {
+    overflow: hidden;
+    padding-bottom: 0.06em;
+  }
+
   /* Etiqueta pequeña en versales con un "+" delante, para datos sueltos
      (disponibilidad, plazos) que acompañan sin pedir protagonismo. */
   .marbete::before {

@@ -4,8 +4,8 @@ import { PROYECTOS } from '../data/proyectos';
 
 export default function Proyectos() {
   return (
-    <article>
-      <Cabecera sobretitulo="Trabajo seleccionado" titulo="Proyectos." />
+    <section id="proyectos" className="scroll-mt-24 py-[clamp(4rem,10vw,8rem)]">
+      <Cabecera sobretitulo="Trabajo seleccionado" titulo="Webs que ya están funcionando." />
 
       {PROYECTOS.length === 0 ? (
         <div className="max-w-[42rem] rounded-[clamp(1rem,2vw,1.5rem)] border border-dashed border-borde-fuerte p-6 text-sm text-texto-2">
@@ -19,6 +19,6 @@ export default function Proyectos() {
           ))}
         </ul>
       )}
-    </article>
+    </section>
   );
 }

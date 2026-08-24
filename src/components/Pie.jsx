@@ -97,7 +97,7 @@ export default function Pie({ onIr, secciones }) {
       {/* Franja final: el mismo fluido de la portada, cerrando el círculo */}
       <div className="relative h-[clamp(9rem,22vw,15rem)]">
         <div className="absolute inset-0">
-          <FondoFluido escala={5} />
+          <FondoFluido escala={3} />
         </div>
         <div className="relative flex h-full items-end justify-between px-[clamp(0.875rem,2.5vw,2.5rem)] pb-[clamp(1rem,3vw,2rem)]">
           <Logo tamano="clamp(1.05rem,2.6vw,1.3rem)" />

@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Lenis from 'lenis';
+import { gsap, ScrollTrigger, SplitText, quieto } from './gsap';
 
 const CLAVE_TEMA = 'tema';
 
@@ -38,9 +40,126 @@ export function useTema() {
 }
 
 /**
- * Publica la posición del cursor dentro del elemento como --mx / --my,
- * que es lo que lee el foco de luz de .foco en CSS.
+ * Scroll con inercia. Lenis interpola la posición en cada cuadro y ScrollTrigger
+ * lee esa posición en lugar de la del navegador, así las animaciones ligadas al
+ * scroll van sincronizadas con el movimiento suave y no con el salto real.
  */
+export function useScrollSuave() {
+  const refLenis = useRef(null);
+
+  useEffect(() => {
+    if (quieto()) return;
+
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      smoothWheel: true,
+    });
+    refLenis.current = lenis;
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    const avanzar = (t) => lenis.raf(t * 1000);
+    gsap.ticker.add(avanzar);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(avanzar);
+      lenis.destroy();
+      refLenis.current = null;
+    };
+  }, []);
+
+  /** Lleva la vista a un elemento por id, respetando el alto de la barra. */
+  const irA = useCallback((id) => {
+    const destino = id === 'portada' ? 0 : document.getElementById(id);
+    if (destino === null) return;
+    const lenis = refLenis.current;
+    if (lenis) lenis.scrollTo(destino, { offset: id === 'portada' ? 0 : -70, duration: 1.2 });
+    else if (typeof destino === 'number') window.scrollTo({ top: 0, behavior: 'smooth' });
+    else destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const parar = useCallback((detener) => {
+    const lenis = refLenis.current;
+    if (!lenis) return;
+    if (detener) lenis.stop();
+    else lenis.start();
+  }, []);
+
+  return { irA, parar };
+}
+
+/**
+ * Marca qué sección ocupa la pantalla, para que la barra sepa dónde estamos.
+ */
+export function useSeccionVisible(ids) {
+  const [activa, setActiva] = useState('portada');
+
+  useLayoutEffect(() => {
+    const disparadores = ids.map((id) => {
+      const nodo = document.getElementById(id);
+      if (!nodo) return null;
+      return ScrollTrigger.create({
+        trigger: nodo,
+        start: 'top 45%',
+        end: 'bottom 45%',
+        onToggle: ({ isActive }) => isActive && setActiva(id),
+      });
+    });
+
+    const arriba = ScrollTrigger.create({
+      trigger: document.body,
+      start: 'top top',
+      end: '+=300',
+      onToggle: ({ isActive }) => isActive && setActiva('portada'),
+    });
+
+    return () => {
+      disparadores.forEach((d) => d?.kill());
+      arriba.kill();
+    };
+  }, [ids]);
+
+  return activa;
+}
+
+/**
+ * Revela un titular palabra a palabra desde detrás de una máscara. SplitText
+ * parte el texto y deja el original accesible para lectores de pantalla.
+ */
+export function useTitularRevelado(dependencia) {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const nodo = ref.current;
+    if (!nodo || quieto()) return;
+
+    const contexto = gsap.context(() => {
+      const partido = new SplitText(nodo, {
+        type: 'lines,words',
+        linesClass: 'linea-recorte',
+        autoSplit: true,
+      });
+
+      gsap.from(partido.words, {
+        yPercent: 115,
+        duration: 1,
+        ease: 'salida',
+        stagger: 0.05,
+        scrollTrigger: { trigger: nodo, start: 'top 88%' },
+      });
+
+      return () => partido.revert();
+    }, nodo);
+
+    return () => contexto.revert();
+  }, [dependencia]);
+
+  return ref;
+}
+
+/** Publica la posición del cursor como --mx/--my para el foco de luz. */
 export function useFoco() {
   const ref = useRef(null);
 
@@ -55,36 +174,31 @@ export function useFoco() {
   return { ref, onMouseMove: alMover };
 }
 
-/**
- * Revela el elemento cuando entra en pantalla. Devuelve una ref y un booleano;
- * deja de observar en cuanto se ha revelado, no hace falta vigilar más.
- */
-export function useRevelar({ margen = '0px 0px -12% 0px' } = {}) {
+/** Revela un bloque al entrar en pantalla, con retardo opcional. */
+export function useRevelar({ retraso = 0 } = {}) {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const nodo = ref.current;
     if (!nodo) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setVisible(true);
+    if (quieto()) {
+      gsap.set(nodo, { opacity: 1, y: 0 });
       return;
     }
 
-    const observador = new IntersectionObserver(
-      ([entrada]) => {
-        if (entrada.isIntersecting) {
-          setVisible(true);
-          observador.disconnect();
-        }
-      },
-      { rootMargin: margen },
-    );
+    const contexto = gsap.context(() => {
+      gsap.from(nodo, {
+        opacity: 0,
+        y: 28,
+        duration: 0.9,
+        delay: retraso,
+        ease: 'salida',
+        scrollTrigger: { trigger: nodo, start: 'top 90%' },
+      });
+    }, nodo);
 
-    observador.observe(nodo);
-    return () => observador.disconnect();
-  }, [margen]);
+    return () => contexto.revert();
+  }, [retraso]);
 
-  return { ref, visible };
+  return ref;
 }

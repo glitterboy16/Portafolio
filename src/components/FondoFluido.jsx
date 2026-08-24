@@ -24,7 +24,7 @@ const TINTA = {
   dark: [178, 138, 250],
 };
 
-export default function FondoFluido({ escala = 6, className = '' }) {
+export default function FondoFluido({ escala = 3, className = '' }) {
   const refLienzo = useRef(null);
 
   useEffect(() => {

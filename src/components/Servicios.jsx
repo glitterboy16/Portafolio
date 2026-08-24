@@ -30,7 +30,7 @@ export default function Servicios() {
   );
 
   return (
-    <article>
+    <section id="precios" className="scroll-mt-24 py-[clamp(4rem,10vw,8rem)]">
       <Cabecera sobretitulo="Servicios" titulo="Un precio claro desde el principio." />
 
       <p className="animate-aparecer mb-2 max-w-[58ch] text-[clamp(0.95rem,1.6vw,1.0625rem)] text-texto-2 [animation-delay:300ms]">
@@ -109,6 +109,6 @@ export default function Servicios() {
           </p>
         </div>
       </div>
-    </article>
+    </section>
   );
 }

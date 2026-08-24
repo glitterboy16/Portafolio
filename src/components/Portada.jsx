@@ -10,7 +10,7 @@ export default function Portada({ onIr }) {
     <section className="relative flex min-h-dvh flex-col overflow-hidden">
       {/* La trama se retira del centro para dejar respirar al texto */}
       <div className="absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_60%_45%_at_50%_42%,transparent_35%,black_80%)]">
-        <FondoFluido escala={5} />
+        <FondoFluido escala={3} />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
