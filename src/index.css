@@ -10,13 +10,15 @@
    contenido respire y el color se note cuando aparece.
    ============================================================ */
 :root {
-  --c-fondo: oklch(0.99 0.002 300);
-  --c-fondo-2: oklch(0.975 0.004 300);
-  --c-vidrio: oklch(1 0 0 / 0.72);
-  --c-vidrio-alto: oklch(1 0 0 / 0.86);
-  --c-brillo: oklch(1 0 0 / 0.95);
-  --c-texto: oklch(0.19 0.008 300);
-  --c-texto-2: oklch(0.46 0.01 300);
+  /* Un crudo templado en vez de blanco puro: en pantalla grande y a oscuras,
+     el blanco absoluto deslumbra. */
+  --c-fondo: oklch(0.955 0.004 300);
+  --c-fondo-2: oklch(0.925 0.005 300);
+  --c-vidrio: oklch(1 0 0 / 0.7);
+  --c-vidrio-alto: oklch(1 0 0 / 0.84);
+  --c-brillo: oklch(1 0 0 / 0.9);
+  --c-texto: oklch(0.21 0.008 300);
+  --c-texto-2: oklch(0.47 0.01 300);
   --c-texto-3: oklch(0.62 0.01 300);
   --c-acento: oklch(0.53 0.2 300);
   --c-acento-suave: oklch(0.53 0.2 300 / 0.1);
@@ -29,8 +31,13 @@
   --c-malla-1: oklch(0.7 0.23 300);
   --c-malla-2: oklch(0.72 0.24 350);
   --c-malla-3: oklch(0.72 0.2 255);
-  --c-malla-opacidad: 0.42;
-  --c-velo: oklch(0.99 0.002 300);
+  --c-malla-opacidad: 0.4;
+  --c-velo: oklch(0.955 0.004 300);
+  --c-grano: 0.05;
+
+  /* Sólidos planos: el acento se usa como tinta, sin degradados */
+  --c-solido: oklch(0.5 0.21 300);
+  --c-solido-texto: oklch(0.98 0.005 300);
 }
 
 /* ============================================================
@@ -56,6 +63,10 @@
   --c-malla-3: oklch(0.52 0.22 255);
   --c-malla-opacidad: 0.5;
   --c-velo: oklch(0.14 0.006 300);
+  --c-grano: 0.09;
+
+  --c-solido: oklch(0.62 0.22 300);
+  --c-solido-texto: oklch(0.99 0.005 300);
 }
 
 @theme inline {
@@ -71,8 +82,10 @@
   --color-acento-suave: var(--c-acento-suave);
   --color-borde: var(--c-borde);
   --color-borde-fuerte: var(--c-borde-fuerte);
+  --color-solido: var(--c-solido);
+  --color-solido-texto: var(--c-solido-texto);
 
-  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   --ease-suave: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-entrada: cubic-bezier(0.22, 1, 0.36, 1);
@@ -135,6 +148,19 @@
     transition:
       background-color 500ms var(--ease-suave),
       color 500ms var(--ease-suave);
+  }
+
+  /* Grano sobre toda la página: rompe la planitud del color y le quita
+     el aspecto de degradado digital. Se genera con feTurbulence, sin
+     imágenes externas. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: var(--c-grano);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
   }
 
   ::selection {
@@ -204,6 +230,40 @@
 
   .foco:hover::before {
     opacity: 1;
+  }
+
+  /* Etiqueta pequeña en versales con un "+" delante, para datos sueltos
+     (disponibilidad, plazos) que acompañan sin pedir protagonismo. */
+  .marbete::before {
+    content: '+ ';
+  }
+
+  .marbete {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-texto-3);
+  }
+
+  /* Botón de tinta plana: sin degradado y con esquina apenas suavizada. */
+  .solido {
+    background: var(--c-solido);
+    color: var(--c-solido-texto);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition:
+      filter 200ms var(--ease-suave),
+      transform 200ms var(--ease-suave);
+  }
+
+  .solido:hover {
+    filter: brightness(1.12);
+  }
+
+  .solido:active {
+    transform: scale(0.98);
   }
 }
 

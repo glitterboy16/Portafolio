@@ -5,12 +5,14 @@ import Navegacion from './components/Navegacion';
 import Inicio from './components/Inicio';
 import Resumen from './components/Resumen';
 import Proyectos from './components/Proyectos';
+import Servicios from './components/Servicios';
 import { useTema } from './hooks';
 
 const SECCIONES = [
   { id: 'inicio', etiqueta: 'Inicio', Componente: Inicio },
   { id: 'resumen', etiqueta: 'Resumen', Componente: Resumen },
   { id: 'proyectos', etiqueta: 'Proyectos', Componente: Proyectos },
+  { id: 'servicios', etiqueta: 'Precios', Componente: Servicios },
 ];
 
 export default function App() {
