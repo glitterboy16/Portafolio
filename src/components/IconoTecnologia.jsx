@@ -16,7 +16,7 @@ function aislarIds(svg, sufijo) {
  * Icono de tecnología: gris en reposo, colores reales al pasar el ratón o
  * enfocar. En móvil el nombre se abre como popover al tocarlo.
  */
-export default function IconoTecnologia({ clave, tamano = 22, conEtiqueta = false }) {
+export default function IconoTecnologia({ clave, tamano = 22, conEtiqueta = false, celda = false }) {
   const tecnologia = TECNOLOGIAS[clave];
   const idBase = useId().replace(/:/g, '');
   const [sobre, setSobre] = useState(false);
@@ -69,8 +69,14 @@ export default function IconoTecnologia({ clave, tamano = 22, conEtiqueta = fals
       <span
         onMouseEnter={() => setSobre(true)}
         onMouseLeave={() => setSobre(false)}
-        className={`vidrio inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ease-suave hover:-translate-y-0.5 hover:scale-[1.04] ${
-          activo ? 'text-texto' : 'text-texto-2'
+        className={`transition-all duration-300 ease-suave ${
+          celda
+            ? `flex h-full flex-col items-center justify-center gap-2 bg-vidrio px-3 py-6 text-center text-[0.8125rem] ${
+                activo ? 'bg-vidrio-alto text-texto' : 'text-texto-2'
+              }`
+            : `vidrio inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium hover:-translate-y-0.5 hover:scale-[1.04] ${
+                activo ? 'text-texto' : 'text-texto-2'
+              }`
         }`}
       >
         {icono}

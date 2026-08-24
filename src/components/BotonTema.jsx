@@ -2,7 +2,7 @@
  * Alterna claro/oscuro. El sol y la luna comparten sitio: uno gira y se
  * encoge mientras el otro entra, así el cambio se lee como un solo gesto.
  */
-export default function BotonTema({ tema, alternar }) {
+export default function BotonTema({ tema, alternar, compacto = false }) {
   const esOscuro = tema === 'dark';
 
   return (
@@ -11,7 +11,11 @@ export default function BotonTema({ tema, alternar }) {
       onClick={alternar}
       aria-label={esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
       title={esOscuro ? 'Modo claro' : 'Modo oscuro'}
-      className="vidrio group grid size-11 shrink-0 place-items-center rounded-full text-texto-2 transition-all duration-300 ease-suave hover:scale-105 hover:text-texto active:scale-95"
+      className={`group grid shrink-0 place-items-center text-texto-2 transition-all duration-300 ease-suave hover:text-texto active:scale-95 ${
+        compacto
+          ? 'size-8 border border-borde hover:border-borde-fuerte'
+          : 'vidrio size-11 rounded-full hover:scale-105'
+      }`}
     >
       <span className="relative block size-5">
         <svg

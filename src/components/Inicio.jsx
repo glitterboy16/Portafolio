@@ -47,14 +47,16 @@ export default function Inicio() {
         <h3 className="animate-aparecer mb-4 text-[clamp(1.2rem,2.2vw,1.4rem)] font-semibold tracking-tight [animation-delay:620ms]">
           Habilidades
         </h3>
-        <ul className="flex flex-wrap gap-2.5">
+        {/* Rejilla de celdas separadas por una hendidura de 4px: las líneas
+            que se ven son el fondo asomando, no bordes. */}
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1">
           {HABILIDADES.map((clave, i) => (
             <li
               key={clave}
               className="animate-aparecer"
               style={{ animationDelay: `${680 + i * 45}ms` }}
             >
-              <IconoTecnologia clave={clave} conEtiqueta />
+              <IconoTecnologia clave={clave} conEtiqueta celda />
             </li>
           ))}
         </ul>

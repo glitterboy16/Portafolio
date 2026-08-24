@@ -1,59 +1,67 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import BotonTema from './BotonTema';
 
 /**
- * Segmented control con píldora deslizante. La píldora se mide sobre el botón
- * activo real, así que sigue cuadrando aunque cambien los textos o la fuente.
+ * Barra superior a ancho completo, compacta y de esquinas rectas: el nombre a
+ * la izquierda, las secciones en medio y una acción sólida a la derecha.
+ * La sección activa se marca con una regla bajo el texto, no con una píldora.
  */
-export default function Navegacion({ secciones, activa, onCambiar }) {
-  const botones = useRef({});
-  const [pildora, setPildora] = useState({ left: 0, width: 0 });
-  const [lista, setLista] = useState(false);
-
-  useLayoutEffect(() => {
-    const colocar = () => {
-      const boton = botones.current[activa];
-      if (!boton) return;
-      setPildora({ left: boton.offsetLeft, width: boton.offsetWidth });
-    };
-
-    colocar();
-    const id = requestAnimationFrame(() => setLista(true));
-    window.addEventListener('resize', colocar);
-    document.fonts?.ready.then(colocar);
-
-    return () => {
-      cancelAnimationFrame(id);
-      window.removeEventListener('resize', colocar);
-    };
-  }, [activa]);
-
+export default function Navegacion({ secciones, activa, onCambiar, tema, alternar }) {
   return (
-    <nav className="animate-aparecer sticky top-[clamp(0.5rem,2vw,1.5rem)] z-30 mb-[clamp(2rem,5vw,3.5rem)]">
-      <ul className="vidrio relative flex w-full gap-1 rounded-full p-1 sm:inline-flex sm:w-auto">
-        <li
-          aria-hidden="true"
-          style={{ transform: `translateX(${pildora.left}px)`, width: pildora.width }}
-          className={`absolute inset-y-1 left-0 rounded-full bg-acento shadow-[0_6px_20px_-6px_var(--c-acento)] ${
-            lista
-              ? 'opacity-100 transition-[transform,width,opacity] duration-500 ease-entrada'
-              : 'opacity-0'
-          }`}
-        />
-        {secciones.map(({ id, etiqueta }) => (
-          <li key={id} className="min-w-0 flex-1 sm:flex-none">
-            <button
-              ref={(el) => (botones.current[id] = el)}
-              onClick={() => onCambiar(id)}
-              aria-current={activa === id ? 'page' : undefined}
-              className={`relative z-10 w-full rounded-full px-2 py-2 text-[clamp(0.8125rem,1.6vw,0.875rem)] font-semibold tracking-wide transition-colors duration-300 ease-suave active:scale-95 sm:px-6 ${
-                activa === id ? 'text-fondo' : 'text-texto-2 hover:text-texto'
-              }`}
+    <header className="sticky top-0 z-40 border-b border-borde bg-fondo/80 backdrop-blur-xl backdrop-saturate-150">
+      <div className="mx-auto flex max-w-[1240px] items-center gap-3 px-[clamp(0.875rem,2.5vw,2.5rem)] py-2.5">
+        <button
+          onClick={() => onCambiar(secciones[0].id)}
+          className="mr-auto flex shrink-0 items-center gap-2 text-[0.8125rem] font-semibold tracking-[-0.01em] transition-opacity duration-200 ease-suave hover:opacity-70"
+        >
+          <span aria-hidden="true" className="size-2.5 shrink-0 bg-solido" />
+          <span className="hidden sm:inline">Angel Villorina</span>
+          <span className="sm:hidden">Angel V.</span>
+        </button>
+
+        <nav aria-label="Secciones">
+          <ul className="flex items-center gap-x-[clamp(0.75rem,2vw,1.5rem)]">
+            {secciones.map(({ id, etiqueta }) => (
+              <li key={id}>
+                <button
+                  onClick={() => onCambiar(id)}
+                  aria-current={activa === id ? 'page' : undefined}
+                  className={`relative py-1 text-[clamp(0.75rem,1.8vw,0.8125rem)] tracking-[-0.01em] transition-colors duration-200 ease-suave ${
+                    activa === id ? 'text-texto' : 'text-texto-2 hover:text-texto'
+                  }`}
+                >
+                  {etiqueta}
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-solido transition-transform duration-300 ease-entrada ${
+                      activa === id ? 'scale-x-100' : 'scale-x-0'
+                    }`}
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="ml-1 flex shrink-0 items-center gap-2">
+          {/* El texto rueda al pasar por encima: una copia sale y otra entra */}
+          <button
+            onClick={() => onCambiar('servicios')}
+            className="solido group relative hidden overflow-hidden px-4 py-1.5 text-[0.7rem] sm:block"
+          >
+            <span className="block transition-transform duration-300 ease-entrada group-hover:-translate-y-[150%]">
+              Pedir presupuesto
+            </span>
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 grid translate-y-[150%] place-items-center transition-transform duration-300 ease-entrada group-hover:translate-y-0"
             >
-              {etiqueta}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
+              Pedir presupuesto
+            </span>
+          </button>
+
+          <BotonTema tema={tema} alternar={alternar} compacto />
+        </div>
+      </div>
+    </header>
   );
 }

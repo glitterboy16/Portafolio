@@ -30,12 +30,18 @@ export default function App() {
     <>
       <Aurora />
 
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1240px] flex-col items-start gap-[clamp(1rem,2.5vw,1.75rem)] p-[clamp(0.875rem,2.5vw,2.5rem)] lg:flex-row">
-        <BarraLateral tema={tema} alternar={alternar} />
+      <Navegacion
+        secciones={SECCIONES}
+        activa={activa}
+        onCambiar={cambiar}
+        tema={tema}
+        alternar={alternar}
+      />
+
+      <div className="mx-auto flex min-h-dvh w-full max-w-[1240px] flex-col items-start gap-[clamp(1rem,2.5vw,1.75rem)] px-[clamp(0.875rem,2.5vw,2.5rem)] pb-[clamp(0.875rem,2.5vw,2.5rem)] pt-[clamp(1.5rem,4vw,3rem)] lg:flex-row">
+        <BarraLateral />
 
         <main className="w-full min-w-0 flex-1">
-          <Navegacion secciones={SECCIONES} activa={activa} onCambiar={cambiar} />
-
           {/* La clave remonta la sección para que las entradas se reinicien */}
           <div key={activa}>
             <Componente />

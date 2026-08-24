@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import BotonTema from './BotonTema';
 import { PERFIL } from '../data/perfil';
 import { useFoco } from '../hooks';
 
@@ -19,7 +18,7 @@ const ICONOS_RED = {
   ),
 };
 
-export default function BarraLateral({ tema, alternar }) {
+export default function BarraLateral() {
   const [clicks, setClicks] = useState(0);
   const foco = useFoco();
   const foto = clicks >= 5 ? PERFIL.gif : PERFIL.foto;
@@ -53,10 +52,6 @@ export default function BarraLateral({ tema, alternar }) {
             {PERFIL.nombre}
           </h1>
           <p className="mt-1 text-sm text-texto-2">{PERFIL.cargo}</p>
-        </div>
-
-        <div className="shrink-0 self-start lg:absolute lg:right-[clamp(1.25rem,3vw,2rem)] lg:top-[clamp(1.25rem,3vw,2rem)]">
-          <BotonTema tema={tema} alternar={alternar} />
         </div>
       </div>
 
