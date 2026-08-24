@@ -98,9 +98,12 @@ void main() {
   gl_FragColor = vec4(tinta, encendido);
 }`;
 
+// El mismo lila en los dos temas. En oscuro se probó uno más claro y salía
+// chillón: sobre fondo negro, subir el brillo del punto lo que hace es
+// separarlo del fondo, no integrarlo.
 const TINTA = {
   light: [138 / 255, 96 / 255, 214 / 255],
-  dark: [176 / 255, 138 / 255, 250 / 255],
+  dark: [138 / 255, 96 / 255, 214 / 255],
 };
 
 function compilar(gl, tipo, fuente) {

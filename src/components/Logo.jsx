@@ -1,25 +1,29 @@
 /**
- * Logotipo ANGEL.
+ * Monograma AV — Angel Villorina.
  *
- * Grotesca ancha y pesada, con una letra intervenida: la G lleva dentro un
- * cuadrado en lugar de su hueco redondo, el mismo recurso con el que MONOLOG
- * sustituye una de sus O. Se compone con texto real —no trazados— para que
- * siga siendo seleccionable y no pese nada.
+ * Dos letras en grotesca maciza sobre una rejilla común: misma altura de caja
+ * (140) y mismo grosor de asta, con la A y la V casi tocándose para que se
+ * lean como una sola pieza y no como dos iniciales sueltas.
+ *
+ * Va en trazados, no en texto, para que el monograma sea siempre idéntico y no
+ * dependa de que una tipografía concreta llegue a cargar.
  */
 export default function Logo({ className = '', tamano = '1rem' }) {
   return (
-    <span
-      className={`inline-flex select-none items-center font-[Archivo] font-extrabold uppercase leading-none tracking-[-0.03em] [font-stretch:125%] ${className}`}
-      style={{ fontSize: tamano }}
-      aria-label="Angel"
+    <svg
+      viewBox="0 0 232 140"
+      role="img"
+      aria-label="Angel Villorina"
+      className={`inline-block w-auto select-none fill-current ${className}`}
+      style={{ height: tamano }}
     >
-      <span aria-hidden="true">AN</span>
-      <span aria-hidden="true" className="relative inline-block">
-        G
-        {/* El cuadrado se posa sobre el hueco de la G */}
-        <span className="absolute left-1/2 top-1/2 block size-[0.3em] -translate-x-[45%] -translate-y-[35%] bg-current" />
-      </span>
-      <span aria-hidden="true">EL</span>
-    </span>
+      {/* A — el contraste interior se recorta con evenodd, no con un segundo color */}
+      <path
+        fillRule="evenodd"
+        d="M0 140 48 0h24l48 140H88l-11-32H43l-11 32H0zm51-58h18L60 46 51 82z"
+      />
+      {/* V — el reflejo exacto de la A, sin travesaño */}
+      <path d="M120 0h32l24 96 24-96h32l-40 140h-32L120 0z" />
+    </svg>
   );
 }

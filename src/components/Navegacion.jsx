@@ -63,8 +63,7 @@ export default function Navegacion({ secciones, activa, onIr, tema, alternar, on
               onClick={() => ir('precios')}
               className="group flex items-center gap-2 bg-texto px-3 py-2 text-[0.8125rem] font-medium text-fondo transition-opacity duration-200 ease-suave hover:opacity-90"
             >
-              <span className="hidden sm:inline">Empezar un proyecto</span>
-              <span className="sm:hidden">Empezar</span>
+              Empezar proyecto
               <span className="grid size-[18px] shrink-0 place-items-center bg-fondo text-texto transition-transform duration-300 ease-entrada group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 <svg viewBox="0 0 12 12" className="size-2.5" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 9 9 3M4.2 3H9v4.8" strokeLinecap="square" />
