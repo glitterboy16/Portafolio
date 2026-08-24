@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import FondoFluido from './FondoFluido';
-import Logo from './Logo';
+import Logotipo from './Logotipo';
 import { PERFIL } from '../data/perfil';
 
 /** Hora de Mérida en directo: la web sabe qué hora es donde trabajo. */
@@ -100,7 +100,7 @@ export default function Pie({ onIr, secciones }) {
           <FondoFluido escala={3} />
         </div>
         <div className="relative flex h-full items-end justify-between px-[clamp(0.875rem,2.5vw,2.5rem)] pb-[clamp(1rem,3vw,2rem)]">
-          <Logo tamano="clamp(1.05rem,2.6vw,1.3rem)" />
+          <Logotipo tamano="clamp(1.6rem,4vw,2.4rem)" />
           <p className="text-[clamp(0.75rem,1.8vw,0.875rem)] font-medium">
             ⌜ Que se note lo bueno que ya haces. ⌟
           </p>

@@ -1,5 +1,5 @@
 import FondoFluido from './FondoFluido';
-import { PERFIL } from '../data/perfil';
+import Logotipo from './Logotipo';
 
 /**
  * Primera pantalla: el fluido tramado de fondo, la declaración en el centro y
@@ -45,14 +45,9 @@ export default function Portada({ onIr }) {
         </button>
       </div>
 
-      {/* El nombre a sangre, cortado por abajo como una marca impresa */}
-      <div className="animate-aparecer relative select-none overflow-hidden [animation-delay:480ms]">
-        <span
-          aria-hidden="true"
-          className="block translate-y-[14%] whitespace-nowrap text-center font-[Archivo] text-[19.5vw] font-extrabold uppercase leading-[0.78] tracking-[-0.045em] text-texto [font-stretch:125%]"
-        >
-          {PERFIL.nombre.split(' ')[0]}
-        </span>
+      {/* El logotipo a sangre, cortado por abajo como una marca impresa */}
+      <div className="animate-aparecer relative flex justify-center overflow-hidden px-[2vw] [animation-delay:480ms]">
+        <Logotipo tamano="min(21vw, 15rem)" className="translate-y-[12%] text-texto" />
       </div>
     </section>
   );
