@@ -1,28 +1,119 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Fluido tramado.
+ * Tela al viento, tramada. Se dibuja en la GPU.
  *
- * Se calcula un campo de ondas a resolución muy baja (un píxel del buffer son
- * varios de pantalla) y cada punto se decide contra una matriz de Bayer 4x4:
- * en lugar de mezclar color, se enciende o se apaga. De ahí sale la trama de
- * puntos, y de la baja resolución sale que se mueva con soltura en un móvil.
+ * El mismo efecto calculado en JavaScript costaba unos cinco millones de
+ * operaciones por fotograma y la página se arrastraba a 3 fps. Aquí el ruido,
+ * el pliegue y la trama van en un shader de fragmento: la tarjeta gráfica
+ * resuelve todos los píxeles a la vez y sobra tiempo de sobra por cuadro.
+ *
+ * El tejido sale de ruido fractal con el dominio distorsionado —se usa un
+ * ruido para desplazar las coordenadas de otro—, que es lo que produce
+ * pliegues en lugar de manchas. La trama es una matriz de Bayer 4x4: cada
+ * punto se enciende o se apaga, nunca se mezcla.
  */
 
-// Matriz de Bayer 4x4 normalizada: el umbral que hace de trama.
-const BAYER = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
-].map((fila) => fila.map((v) => (v + 0.5) / 16));
+const VERTICE = `
+attribute vec2 posicion;
+void main() {
+  gl_Position = vec4(posicion, 0.0, 1.0);
+}`;
 
-// La tinta se fija aquí y no se lee del CSS: el canvas necesita un rgb suelto
-// y resolver oklch a mano cuesta más de lo que aporta.
+const FRAGMENTO = `
+precision highp float;
+
+uniform vec2 resolucion;
+uniform float tiempo;
+uniform vec3 tinta;
+uniform float escala;
+
+// Ruido de valor: hash por celda e interpolación suave entre esquinas
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float ruido(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+    mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+
+// Cuatro octavas: la primera da la forma, las demás el tejido fino
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 4; i++) {
+    v += a * ruido(p);
+    p *= 2.03;
+    a *= 0.5;
+  }
+  return v;
+}
+
+// Umbral ordenado 4x4: de aquí sale la trama de puntos
+float bayer(vec2 pixel) {
+  vec2 p = mod(floor(pixel), 4.0);
+  int x = int(p.x);
+  int y = int(p.y);
+  float m[16];
+  m[0]=0.0;  m[1]=8.0;  m[2]=2.0;  m[3]=10.0;
+  m[4]=12.0; m[5]=4.0;  m[6]=14.0; m[7]=6.0;
+  m[8]=3.0;  m[9]=11.0; m[10]=1.0; m[11]=9.0;
+  m[12]=15.0;m[13]=7.0; m[14]=13.0;m[15]=5.0;
+  int idx = y * 4 + x;
+  float valor = 0.0;
+  for (int i = 0; i < 16; i++) {
+    if (i == idx) valor = m[i];
+  }
+  return (valor + 0.5) / 16.0;
+}
+
+void main() {
+  // Se cuantiza a la rejilla de la trama para que el punto sea del tamaño pedido
+  vec2 pixel = floor(gl_FragCoord.xy / escala);
+  vec2 uv = pixel * escala / resolucion;
+  float proporcion = resolucion.x / resolucion.y;
+
+  // El campo se arrastra en diagonal: el viento sopla siempre hacia un lado
+  vec2 d = vec2(uv.x * proporcion * 2.6 - tiempo * 1.6, uv.y * 3.4 + tiempo * 0.55);
+
+  // Distorsionar el dominio con otro ruido es lo que ondula el tejido
+  float deforma = fbm(d * 0.7 + vec2(4.2, -1.7));
+  float campo = fbm(d + deforma * vec2(1.9, 1.3));
+
+  // Doblar el campo sobre sí mismo marca las crestas del pliegue
+  campo = 1.0 - abs(campo - 0.5) * 2.0;
+
+  // La tela se desvanece hacia arriba y hacia abajo
+  float velo = sin(3.14159 * clamp(uv.y * 1.12, 0.0, 1.0));
+  float intensidad = clamp((campo * velo - 0.42) * 2.6, 0.0, 1.0);
+
+  float encendido = step(bayer(pixel), intensidad);
+  gl_FragColor = vec4(tinta, encendido);
+}`;
+
 const TINTA = {
-  light: [150, 108, 220],
-  dark: [178, 138, 250],
+  light: [138 / 255, 96 / 255, 214 / 255],
+  dark: [176 / 255, 138 / 255, 250 / 255],
 };
+
+function compilar(gl, tipo, fuente) {
+  const shader = gl.createShader(tipo);
+  gl.shaderSource(shader, fuente);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error('Shader:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+  return shader;
+}
 
 export default function FondoFluido({ escala = 3, className = '' }) {
   const refLienzo = useRef(null);
@@ -30,62 +121,74 @@ export default function FondoFluido({ escala = 3, className = '' }) {
   useEffect(() => {
     const lienzo = refLienzo.current;
     if (!lienzo) return;
-    const ctx = lienzo.getContext('2d');
-    if (!ctx) return;
+
+    const gl = lienzo.getContext('webgl', { alpha: true, antialias: false, depth: false });
+    if (!gl) return;
+
+    const vs = compilar(gl, gl.VERTEX_SHADER, VERTICE);
+    const fs = compilar(gl, gl.FRAGMENT_SHADER, FRAGMENTO);
+    if (!vs || !fs) return;
+
+    const programa = gl.createProgram();
+    gl.attachShader(programa, vs);
+    gl.attachShader(programa, fs);
+    gl.linkProgram(programa);
+    if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
+      console.error('Programa:', gl.getProgramInfoLog(programa));
+      return;
+    }
+    gl.useProgram(programa);
+
+    // Dos triángulos que cubren la pantalla
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
+    const attr = gl.getAttribLocation(programa, 'posicion');
+    gl.enableVertexAttribArray(attr);
+    gl.vertexAttribPointer(attr, 2, gl.FLOAT, false, 0, 0);
+
+    const uResolucion = gl.getUniformLocation(programa, 'resolucion');
+    const uTiempo = gl.getUniformLocation(programa, 'tiempo');
+    const uTinta = gl.getUniformLocation(programa, 'tinta');
+    const uEscala = gl.getUniformLocation(programa, 'escala');
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniform1f(uEscala, escala);
 
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let cuadro = 0;
-    let imagen = null;
-    let ancho = 0;
-    let alto = 0;
-    let tinta = TINTA.dark;
 
-    const releerTema = () => {
-      tinta = TINTA[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+    const aplicarTinta = () => {
+      const c = TINTA[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+      gl.useProgram(programa);
+      gl.uniform3fv(uTinta, c);
     };
 
     const medir = () => {
       const caja = lienzo.getBoundingClientRect();
-      ancho = Math.max(1, Math.ceil(caja.width / escala));
-      alto = Math.max(1, Math.ceil(caja.height / escala));
-      lienzo.width = ancho;
-      lienzo.height = alto;
-      imagen = ctx.createImageData(ancho, alto);
+      // Se limita a 1x: la trama ya es gruesa y el doble de píxeles no se nota
+      const w = Math.max(1, Math.round(caja.width));
+      const h = Math.max(1, Math.round(caja.height));
+      if (lienzo.width !== w || lienzo.height !== h) {
+        lienzo.width = w;
+        lienzo.height = h;
+      }
+      gl.viewport(0, 0, w, h);
+      gl.useProgram(programa);
+      gl.uniform2f(uResolucion, w, h);
     };
 
-    const pintar = (t) => {
-      if (!imagen) return;
-      const datos = imagen.data;
-      const [r, g, b] = tinta;
-
-      for (let y = 0; y < alto; y++) {
-        const v = y / alto;
-        for (let x = 0; x < ancho; x++) {
-          const u = x / ancho;
-
-          // Tres senos desfasados: una forma orgánica que no se repite a ojo
-          const onda =
-            Math.sin(u * 3.1 + t * 0.00021) * 0.5 +
-            Math.sin(u * 1.7 - v * 2.3 + t * 0.00017) * 0.35 +
-            Math.sin(v * 4.2 + u * 1.1 - t * 0.00013) * 0.3;
-
-          // Banda difusa que ondula por el centro
-          const distancia = Math.abs(v - 0.52 - onda * 0.13);
-          let intensidad = 1 - distancia * 3.4;
-          intensidad = Math.max(0, Math.min(1, intensidad));
-          intensidad *= intensidad;
-
-          const encendido = intensidad > BAYER[y & 3][x & 3];
-          const i = (y * ancho + x) * 4;
-          datos[i] = r;
-          datos[i + 1] = g;
-          datos[i + 2] = b;
-          // Los puntos apagados quedan transparentes: el fondo se ve entre ellos
-          datos[i + 3] = encendido ? 255 : 0;
-        }
-      }
-
-      ctx.putImageData(imagen, 0, 0);
+    const pintar = (ms) => {
+      gl.useProgram(programa);
+      gl.uniform1f(uTiempo, ms * 0.00006);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
     const bucle = (t) => {
@@ -93,7 +196,7 @@ export default function FondoFluido({ escala = 3, className = '' }) {
       cuadro = requestAnimationFrame(bucle);
     };
 
-    releerTema();
+    aplicarTinta();
     medir();
     if (quieto) pintar(0);
     else cuadro = requestAnimationFrame(bucle);
@@ -104,7 +207,10 @@ export default function FondoFluido({ escala = 3, className = '' }) {
     });
     observador.observe(lienzo);
 
-    const vigilante = new MutationObserver(releerTema);
+    const vigilante = new MutationObserver(() => {
+      aplicarTinta();
+      if (quieto) pintar(0);
+    });
     vigilante.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme'],
@@ -114,6 +220,10 @@ export default function FondoFluido({ escala = 3, className = '' }) {
       cancelAnimationFrame(cuadro);
       observador.disconnect();
       vigilante.disconnect();
+      gl.deleteProgram(programa);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      gl.deleteBuffer(buffer);
     };
   }, [escala]);
 
@@ -121,7 +231,7 @@ export default function FondoFluido({ escala = 3, className = '' }) {
     <canvas
       ref={refLienzo}
       aria-hidden="true"
-      className={`pointer-events-none size-full opacity-35 [image-rendering:pixelated] ${className}`}
+      className={`pointer-events-none size-full opacity-45 ${className}`}
     />
   );
 }

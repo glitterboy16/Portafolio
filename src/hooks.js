@@ -174,7 +174,16 @@ export function useFoco() {
   return { ref, onMouseMove: alMover };
 }
 
-/** Revela un bloque al entrar en pantalla, con retardo opcional. */
+/**
+ * Revela un bloque al entrar en pantalla.
+ *
+ * Se usa `fromTo` y no `from` a propósito: con `from`, si el disparador no
+ * llega a activarse —porque el alto del bloque cambió después de medirlo, que
+ * es justo lo que pasa cuando dentro hay un iframe que carga tarde— el
+ * elemento se queda clavado en su estado inicial, es decir, invisible. Con
+ * `fromTo` el destino está declarado, y además se fuerza un recálculo cuando
+ * el contenido termina de cargar.
+ */
 export function useRevelar({ retraso = 0 } = {}) {
   const ref = useRef(null);
 
@@ -187,17 +196,37 @@ export function useRevelar({ retraso = 0 } = {}) {
     }
 
     const contexto = gsap.context(() => {
-      gsap.from(nodo, {
-        opacity: 0,
-        y: 28,
-        duration: 0.9,
-        delay: retraso,
-        ease: 'salida',
-        scrollTrigger: { trigger: nodo, start: 'top 90%' },
-      });
+      gsap.fromTo(
+        nodo,
+        { opacity: 0, y: 28 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          delay: retraso,
+          ease: 'salida',
+          overwrite: 'auto',
+          scrollTrigger: {
+            trigger: nodo,
+            start: 'top 92%',
+            invalidateOnRefresh: true,
+          },
+        },
+      );
     }, nodo);
 
-    return () => contexto.revert();
+    // Los iframes de las vistas previas cambian la altura al cargar; sin este
+    // recálculo, ScrollTrigger sigue trabajando con las medidas de antes.
+    const recalcular = () => ScrollTrigger.refresh();
+    const marcos = nodo.querySelectorAll('iframe');
+    marcos.forEach((m) => m.addEventListener('load', recalcular));
+    const id = setTimeout(recalcular, 400);
+
+    return () => {
+      clearTimeout(id);
+      marcos.forEach((m) => m.removeEventListener('load', recalcular));
+      contexto.revert();
+    };
   }, [retraso]);
 
   return ref;

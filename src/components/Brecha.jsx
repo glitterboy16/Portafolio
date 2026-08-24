@@ -82,7 +82,7 @@ export default function Brecha() {
     ));
 
   return (
-    <section ref={raiz} className="overflow-hidden py-[clamp(5rem,14vw,10rem)]">
+    <section ref={raiz} className="overflow-hidden py-[clamp(3.5rem,8vw,6rem)]">
       <div className="flex items-center justify-center font-[Archivo] text-[clamp(1.35rem,6vw,4.75rem)] font-extrabold uppercase leading-none tracking-[-0.04em] [font-stretch:118%]">
         <span ref={izq} className="flex whitespace-nowrap">
           {letras(IZQUIERDA)}

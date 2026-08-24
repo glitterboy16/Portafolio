@@ -47,19 +47,11 @@ function Stack({ stack }) {
 export default function TarjetaProyecto({ proyecto, indice }) {
   const { nombre, categoria, resumen, aportacion, stack, web, codigo, anio, destacado } = proyecto;
   const foco = useFoco();
-  const { ref, visible } = useRevelar();
-
-  const entrada = {
-    ref,
-    style: { transitionDelay: `${indice * 90}ms` },
-    className: `transition-[opacity,transform] duration-700 ease-entrada ${
-      visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-    }`,
-  };
+  const ref = useRevelar({ retraso: indice * 0.09 });
 
   if (destacado) {
     return (
-      <li {...entrada} className={`${entrada.className} col-span-full`}>
+      <li ref={ref} className="col-span-full">
         <div
           {...foco}
           className="vidrio foco vidrio-alto group relative overflow-hidden rounded-[clamp(1.25rem,2.5vw,2rem)] p-[clamp(1.25rem,3.5vw,2.5rem)]"
@@ -101,7 +93,7 @@ export default function TarjetaProyecto({ proyecto, indice }) {
   }
 
   return (
-    <li {...entrada}>
+    <li ref={ref}>
       <div
         {...foco}
         className="vidrio foco group flex h-full flex-col rounded-[clamp(1rem,2vw,1.5rem)] p-[clamp(1.1rem,2.5vw,1.5rem)] transition-transform duration-500 ease-suave hover:-translate-y-1.5"

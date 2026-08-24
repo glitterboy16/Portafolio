@@ -22,7 +22,7 @@ export default function SobreMi() {
   const foto = clicks >= 5 ? PERFIL.gif : PERFIL.foto;
 
   return (
-    <section id="sobre-mi" className="scroll-mt-24 py-[clamp(4rem,10vw,8rem)]">
+    <section id="sobre-mi" className="scroll-mt-24 py-[clamp(3rem,6vw,5rem)]">
       <Cabecera sobretitulo="Sobre mí" titulo="Estudio de desarrollo de una sola persona." />
 
       <div ref={bloque} className="grid gap-[clamp(1.5rem,4vw,3rem)] lg:grid-cols-[minmax(0,1fr)_20rem]">

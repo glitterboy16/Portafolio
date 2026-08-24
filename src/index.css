@@ -14,8 +14,8 @@
      el blanco absoluto deslumbra. */
   --c-fondo: oklch(0.955 0.004 300);
   --c-fondo-2: oklch(0.925 0.005 300);
-  --c-vidrio: oklch(1 0 0 / 0.7);
-  --c-vidrio-alto: oklch(1 0 0 / 0.84);
+  --c-vidrio: oklch(1 0 0 / 0.82);
+  --c-vidrio-alto: oklch(1 0 0 / 0.92);
   --c-brillo: oklch(1 0 0 / 0.9);
   --c-texto: oklch(0.21 0.008 300);
   --c-texto-2: oklch(0.47 0.01 300);
@@ -26,12 +26,13 @@
   --c-borde-fuerte: oklch(0.19 0.008 300 / 0.16);
   --c-sombra: oklch(0.25 0.02 300 / 0.12);
 
-  /* Malla de color del telón: lila primero, luego rosa y azul.
-     Satura de verdad porque queda lejos, detrás del contenido. */
-  --c-malla-1: oklch(0.7 0.23 300);
-  --c-malla-2: oklch(0.72 0.24 350);
-  --c-malla-3: oklch(0.72 0.2 255);
-  --c-malla-opacidad: 0.4;
+  /* Malla del telón. Los tres tonos caen dentro de una misma familia
+     —lila, violeta, índigo— porque al meter un rosa la mezcla dejaba de
+     leerse como un color y pasaba a leerse como tres. */
+  --c-malla-1: oklch(0.72 0.19 300);
+  --c-malla-2: oklch(0.7 0.18 285);
+  --c-malla-3: oklch(0.72 0.15 268);
+  --c-malla-opacidad: 0.3;
   --c-velo: oklch(0.955 0.004 300);
   --c-grano: 0.05;
 
@@ -46,8 +47,8 @@
 [data-theme='dark'] {
   --c-fondo: oklch(0.14 0.006 300);
   --c-fondo-2: oklch(0.175 0.008 300);
-  --c-vidrio: oklch(0.98 0.01 300 / 0.06);
-  --c-vidrio-alto: oklch(0.98 0.01 300 / 0.1);
+  --c-vidrio: oklch(0.98 0.01 300 / 0.1);
+  --c-vidrio-alto: oklch(0.98 0.01 300 / 0.15);
   --c-brillo: oklch(0.98 0.01 300 / 0.13);
   --c-texto: oklch(0.97 0.004 300);
   --c-texto-2: oklch(0.75 0.01 300);
@@ -58,10 +59,10 @@
   --c-borde-fuerte: oklch(0.98 0.01 300 / 0.2);
   --c-sombra: oklch(0 0 0 / 0.55);
 
-  --c-malla-1: oklch(0.55 0.26 300);
-  --c-malla-2: oklch(0.55 0.25 350);
-  --c-malla-3: oklch(0.52 0.22 255);
-  --c-malla-opacidad: 0.5;
+  --c-malla-1: oklch(0.55 0.24 300);
+  --c-malla-2: oklch(0.52 0.22 285);
+  --c-malla-3: oklch(0.5 0.19 268);
+  --c-malla-opacidad: 0.42;
   --c-velo: oklch(0.14 0.006 300);
   --c-grano: 0.09;
 
