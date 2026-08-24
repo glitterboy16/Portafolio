@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Logo from './Logo';
 import BotonTema from './BotonTema';
 import Menu from './Menu';
+import Boton from './Boton';
 
 /**
  * Barra superior: se conserva tal cual estaba —logo, secciones y llamada a la
@@ -59,17 +60,7 @@ export default function Navegacion({ secciones, activa, onIr, tema, alternar, on
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
-            <button
-              onClick={() => ir('precios')}
-              className="group flex items-center gap-2 bg-texto px-3 py-2 text-[0.8125rem] font-medium text-fondo transition-opacity duration-200 ease-suave hover:opacity-90"
-            >
-              Empezar proyecto
-              <span className="grid size-[18px] shrink-0 place-items-center bg-fondo text-texto transition-transform duration-300 ease-entrada group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                <svg viewBox="0 0 12 12" className="size-2.5" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 9 9 3M4.2 3H9v4.8" strokeLinecap="square" />
-                </svg>
-              </span>
-            </button>
+            <Boton onClick={() => ir('precios')}>Empezar proyecto</Boton>
 
             <BotonTema tema={tema} alternar={alternar} compacto />
 

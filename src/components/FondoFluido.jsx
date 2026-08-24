@@ -30,6 +30,9 @@ uniform float escala;
 uniform float contraste;
 uniform sampler2D imagen;
 uniform bool hayImagen;
+// Por dónde se apaga la tela: x arriba, y abajo. 0 llega al borde, 1 se
+// desvanece antes de alcanzarlo.
+uniform vec2 desvanece;
 
 // Ruido de valor: hash por celda e interpolación suave entre esquinas
 float hash(vec2 p) {
@@ -109,9 +112,10 @@ void main() {
     // Doblar el campo sobre sí mismo marca las crestas del pliegue
     campo = 1.0 - abs(campo - 0.5) * 2.0;
 
-    // La tela se desvanece hacia arriba y hacia abajo
-    float velo = sin(3.14159 * clamp(uv.y * 1.12, 0.0, 1.0));
-    intensidad = clamp((campo * velo - 0.42) * contraste, 0.0, 1.0);
+    // La tela se apaga sólo por donde se le pida
+    float arriba = mix(1.0, smoothstep(0.0, 0.34, uv.y), desvanece.x);
+    float abajo = mix(1.0, smoothstep(1.0, 0.66, uv.y), desvanece.y);
+    intensidad = clamp((campo * arriba * abajo - 0.42) * contraste, 0.0, 1.0);
   }
 
   float encendido = step(bayer(pixel), intensidad);
@@ -145,7 +149,13 @@ function compilar(gl, tipo, fuente) {
  *   como se consiguen formas de humo o tela creíbles.
  * @param {number} contraste - cuánto se separan luces y sombras antes de tramar
  */
-export default function FondoFluido({ escala = 3, imagen, contraste = 3.1, className = '' }) {
+export default function FondoFluido({
+  escala = 3,
+  imagen,
+  contraste = 3.1,
+  desvanece = [1, 1],
+  className = '',
+}) {
   const refLienzo = useRef(null);
 
   useEffect(() => {
@@ -186,6 +196,7 @@ export default function FondoFluido({ escala = 3, imagen, contraste = 3.1, class
     const uTinta = gl.getUniformLocation(programa, 'tinta');
     const uEscala = gl.getUniformLocation(programa, 'escala');
     const uContraste = gl.getUniformLocation(programa, 'contraste');
+    const uDesvanece = gl.getUniformLocation(programa, 'desvanece');
     const uImagen = gl.getUniformLocation(programa, 'imagen');
     const uHayImagen = gl.getUniformLocation(programa, 'hayImagen');
 
@@ -193,6 +204,7 @@ export default function FondoFluido({ escala = 3, imagen, contraste = 3.1, class
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.uniform1f(uEscala, escala);
     gl.uniform1f(uContraste, contraste);
+    gl.uniform2f(uDesvanece, desvanece[0], desvanece[1]);
     gl.uniform1i(uHayImagen, 0);
 
     // La imagen, si la hay, entra como textura en cuanto termina de cargar
@@ -289,7 +301,9 @@ export default function FondoFluido({ escala = 3, imagen, contraste = 3.1, class
       gl.deleteShader(fs);
       gl.deleteBuffer(buffer);
     };
-  }, [escala, imagen, contraste]);
+    // Se depende de los valores y no del array: uno nuevo en cada render
+    // reiniciaría el contexto de WebGL sin motivo.
+  }, [escala, imagen, contraste, desvanece[0], desvanece[1]]);
 
   return (
     <canvas

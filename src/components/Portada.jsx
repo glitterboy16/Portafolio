@@ -8,9 +8,10 @@ import Logotipo from './Logotipo';
 export default function Portada({ onIr }) {
   return (
     <section className="relative flex min-h-dvh flex-col overflow-hidden">
-      {/* La trama se retira del centro para dejar respirar al texto */}
-      <div className="absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_60%_45%_at_50%_42%,transparent_35%,black_80%)]">
-        <FondoFluido escala={3} />
+      {/* La tela cubre hasta el borde superior; sólo se retira del centro,
+          en forma de óvalo, para dejar respirar al texto. */}
+      <div className="absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_58%_42%_at_50%_40%,transparent_30%,black_78%)]">
+        <FondoFluido escala={3} desvanece={[0, 1]} />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">

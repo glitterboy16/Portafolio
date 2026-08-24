@@ -1,12 +1,12 @@
 /**
  * Catálogo de tecnologías.
  *
- * Los iconos son los SVG oficiales de devicon, importados en crudo para que
- * conserven sus colores reales (el degradado de Vite, la taza azul de Java).
- * En reposo se muestran en gris mediante un filtro CSS.
+ * Hay tres maneras de traer un icono, por orden de preferencia:
+ *   svg   — archivo de devicon en crudo, a todo color (lo habitual)
+ *   path  — trazado de simple-icons, monocromo, con su color de marca al lado
+ *   sigla — para lo que no está en ninguna librería, un monograma tipográfico
  *
- * Para añadir una tecnología: importa su SVG de devicon y añádela abajo.
- * Los archivos están en node_modules/devicon/icons/<nombre>/.
+ * Para añadir una tecnología, impórtala arriba y añádela abajo.
  */
 import html from 'devicon/icons/html5/html5-original.svg?raw';
 import css from 'devicon/icons/css3/css3-original.svg?raw';
@@ -21,6 +21,16 @@ import figma from 'devicon/icons/figma/figma-original.svg?raw';
 import bash from 'devicon/icons/bash/bash-original.svg?raw';
 import git from 'devicon/icons/git/git-original.svg?raw';
 import node from 'devicon/icons/nodejs/nodejs-original.svg?raw';
+import python from 'devicon/icons/python/python-original.svg?raw';
+import vscode from 'devicon/icons/vscode/vscode-original.svg?raw';
+
+import { siN8n, siClaude } from 'simple-icons';
+
+const deSimple = (icono, nombre = icono.title) => ({
+  nombre,
+  path: icono.path,
+  color: `#${icono.hex}`,
+});
 
 export const TECNOLOGIAS = {
   html: { nombre: 'HTML', svg: html },
@@ -36,9 +46,16 @@ export const TECNOLOGIAS = {
   bash: { nombre: 'Bash', svg: bash },
   git: { nombre: 'Git', svg: git },
   node: { nombre: 'Node.js', svg: node },
+  python: { nombre: 'Python', svg: python },
+  vscode: { nombre: 'VS Code', svg: vscode },
+  n8n: deSimple(siN8n),
+  claude: deSimple(siClaude),
+  // Antigravity es demasiado reciente para estar en devicon o simple-icons;
+  // hasta que Angel pase el SVG oficial, va con monograma.
+  antigravity: { nombre: 'Antigravity', sigla: 'Ag', color: '#4285F4' },
 };
 
-/** Orden en que aparecen en la sección Habilidades. */
+/** Orden en que aparecen en la sección de habilidades. */
 export const HABILIDADES = [
   'html',
   'css',
@@ -46,10 +63,16 @@ export const HABILIDADES = [
   'react',
   'tailwind',
   'vite',
+  'node',
   'supabase',
+  'python',
   'java',
   'bootstrap',
+  'n8n',
+  'claude',
   'figma',
+  'vscode',
+  'antigravity',
   'git',
   'bash',
 ];

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import FondoFluido from './FondoFluido';
 import Logotipo from './Logotipo';
-import { PERFIL } from '../data/perfil';
+import { REDES } from '../data/redes';
+import IconoRed from './IconoRed';
 
 /** Hora de Mérida en directo: la web sabe qué hora es donde trabajo. */
 function useReloj() {
@@ -50,27 +51,12 @@ export default function Pie({ onIr, secciones }) {
 
           <div className="sm:justify-self-end sm:text-right">
             <p className="marbete mb-3">Dónde encontrarme</p>
-            <ul className="flex gap-2 sm:justify-end">
-              {PERFIL.redes.map(({ nombre, href }) => (
-                <li key={nombre}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block border border-borde px-3 py-2 text-[0.8125rem] text-texto-2 transition-colors duration-200 ease-suave hover:border-borde-fuerte hover:text-texto"
-                  >
-                    {nombre}
-                  </a>
+            <ul className="flex flex-wrap gap-2 sm:justify-end">
+              {REDES.map((red) => (
+                <li key={red.nombre}>
+                  <IconoRed red={red} />
                 </li>
               ))}
-              <li>
-                <a
-                  href="mailto:villorinaangelandres@gmail.com"
-                  className="block border border-borde px-3 py-2 text-[0.8125rem] text-texto-2 transition-colors duration-200 ease-suave hover:border-borde-fuerte hover:text-texto"
-                >
-                  Email
-                </a>
-              </li>
             </ul>
           </div>
         </div>
@@ -97,7 +83,7 @@ export default function Pie({ onIr, secciones }) {
       {/* Franja final: el mismo fluido de la portada, cerrando el círculo */}
       <div className="relative h-[clamp(9rem,22vw,15rem)]">
         <div className="absolute inset-0">
-          <FondoFluido escala={3} />
+          <FondoFluido escala={3} desvanece={[1, 0]} />
         </div>
         <div className="relative flex h-full items-end justify-between px-[clamp(0.875rem,2.5vw,2.5rem)] pb-[clamp(1rem,3vw,2rem)]">
           <Logotipo tamano="clamp(1.6rem,4vw,2.4rem)" />

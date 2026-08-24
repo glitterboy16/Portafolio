@@ -79,10 +79,12 @@ export default function VistaPrevia({ url, nombre, proporcion = 16 / 10 }) {
       {/* Mientras carga: latido sutil en lugar de un hueco vacío */}
       {!cargado && <div className="absolute inset-0 animate-pulse bg-fondo-2" aria-hidden="true" />}
 
-      {/* Velo que atenúa la web y se levanta al pasar el ratón por la tarjeta */}
+      {/* Velo que atenúa la web y se levanta al pasar el ratón por la tarjeta.
+          Va en oscuro y no en el color del fondo: en modo claro, un velo
+          blanco lava la captura en lugar de asentarla. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-fondo/20 transition-opacity duration-500 ease-suave group-hover:opacity-0"
+        className="absolute inset-0 bg-[oklch(0.15_0.01_300/0.18)] transition-opacity duration-500 ease-suave group-hover:opacity-0"
       />
     </div>
   );

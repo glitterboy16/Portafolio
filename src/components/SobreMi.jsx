@@ -44,10 +44,23 @@ export default function SobreMi() {
             ))}
           </div>
 
-          {PERFIL.educacion.map(({ titulo, fecha, descripcion }) => (
+          {[...PERFIL.experiencia, ...PERFIL.educacion].map(({ titulo, fecha, descripcion, href }) => (
             <div key={titulo} className="mt-1 bg-vidrio p-5">
               <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-4">
-                <h3 className="font-medium tracking-[-0.01em]">{titulo}</h3>
+                <h3 className="font-medium tracking-[-0.01em]">
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline-offset-4 transition-colors duration-200 ease-suave hover:text-acento hover:underline"
+                    >
+                      {titulo}
+                    </a>
+                  ) : (
+                    titulo
+                  )}
+                </h3>
                 <span className="marbete">{fecha}</span>
               </div>
               <p className="max-w-[58ch] text-sm text-texto-2">{descripcion}</p>
@@ -91,7 +104,7 @@ export default function SobreMi() {
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1">
           {HABILIDADES.map((clave) => (
             <li key={clave}>
-              <IconoTecnologia clave={clave} conEtiqueta celda />
+              <IconoTecnologia clave={clave} tamano={38} conEtiqueta celda />
             </li>
           ))}
         </ul>
