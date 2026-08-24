@@ -1,8 +1,12 @@
+// Los archivos de public/ se piden a través de BASE_URL: en Vercel la base es
+// "/" y en GitHub Pages "/Portafolio/", y una ruta absoluta fallaría allí.
+const publico = (archivo) => `${import.meta.env.BASE_URL}${archivo}`;
+
 export const PERFIL = {
   nombre: 'Angel Villorina',
   cargo: 'Desarrollador de Aplicaciones Web',
-  foto: '/yo.jpg',
-  gif: '/Gabino-gif.gif',
+  foto: publico('yo.jpg'),
+  gif: publico('Gabino-gif.gif'),
   presentacion: [
     'Soy estudiante de Desarrollo de Aplicaciones Web. Trabajo en el desarrollo y la resolución de problemas tecnológicos, convirtiendo problemas complejos en soluciones simples.',
     'Últimamente construyo productos reales para negocios de hostelería: cartas digitales y webs que sus dueños pueden gestionar solos, sin depender de nadie.',
