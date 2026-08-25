@@ -9,9 +9,19 @@ const publico = (archivo) => `${import.meta.env.BASE_URL}${archivo}`;
 export const PERFIL = {
   nombre: 'Angel Villorina',
   cargo: { es: 'Desarrollador de Aplicaciones Web', en: 'Web Application Developer' },
-  // Rotan en el retrato, una detrás de otra con su pausa. Si alguna todavía
-  // no está en public/, el componente la descarta y sigue con las demás.
-  fotos: [publico('perfil-1.jpg'), publico('perfil-2.jpg'), publico('perfil-3.jpg')],
+  /**
+   * Rotan en el retrato, una detrás de otra con su pausa. Si alguna todavía
+   * no está en public/, el componente la descarta y sigue con las demás.
+   *
+   * `encuadre` es el punto por el que se recorta al cuadrado. Las fotos de
+   * grupo llevan las caras en el tercio superior, así que centrarlas dejaría
+   * el recorte a la altura de las corbatas.
+   */
+  fotos: [
+    { src: publico('perfil-1.jpg'), encuadre: 'center 32%' },
+    { src: publico('perfil-2.jpg'), encuadre: 'center 22%' },
+    { src: publico('perfil-3.jpg'), encuadre: 'center 40%' },
+  ],
   fotoRespaldo: publico('yo.jpg'),
   gif: publico('Gabino-gif.gif'),
 

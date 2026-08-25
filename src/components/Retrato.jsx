@@ -26,7 +26,8 @@ export default function Retrato({ className = '' }) {
   const { t } = useIdioma();
 
   const esGabino = clicks >= 5;
-  const lista = disponibles.length > 0 ? disponibles : [PERFIL.fotoRespaldo];
+  const lista =
+    disponibles.length > 0 ? disponibles : [{ src: PERFIL.fotoRespaldo, encuadre: 'center' }];
 
   useEffect(() => {
     if (esGabino || lista.length < 2) return;
@@ -39,9 +40,9 @@ export default function Retrato({ className = '' }) {
     return () => clearInterval(temporizador.current);
   }, [esGabino, lista.length]);
 
-  const descartar = (ruta) =>
+  const descartar = (src) =>
     setDisponibles((actuales) => {
-      const quedan = actuales.filter((f) => f !== ruta);
+      const quedan = actuales.filter((f) => f.src !== src);
       setIndice(0);
       return quedan;
     });
@@ -61,14 +62,14 @@ export default function Retrato({ className = '' }) {
             className="size-full object-cover transition-transform duration-700 ease-suave hover:scale-[1.03]"
           />
         ) : (
-          lista.map((ruta, i) => (
+          lista.map(({ src, encuadre }, i) => (
             <img
-              key={ruta}
-              src={ruta}
+              key={src}
+              src={src}
               alt={i === indice ? PERFIL.nombre : ''}
               aria-hidden={i !== indice}
-              onError={() => descartar(ruta)}
-              style={{ transitionDuration: `${CRUCE}ms` }}
+              onError={() => descartar(src)}
+              style={{ transitionDuration: `${CRUCE}ms`, objectPosition: encuadre }}
               className={`absolute inset-0 size-full object-cover transition-opacity ease-suave ${
                 i === indice ? 'opacity-100' : 'opacity-0'
               }`}
@@ -85,9 +86,9 @@ export default function Retrato({ className = '' }) {
       {/* Marcas de posición: dicen cuántas fotos hay y en cuál vamos */}
       {!esGabino && lista.length > 1 && (
         <div className="pointer-events-none absolute right-3 top-3 flex gap-1.5">
-          {lista.map((ruta, i) => (
+          {lista.map(({ src }, i) => (
             <span
-              key={ruta}
+              key={src}
               className={`h-1 rounded-full bg-white transition-all duration-500 ease-suave ${
                 i === indice ? 'w-4 opacity-90' : 'w-1 opacity-45'
               }`}
