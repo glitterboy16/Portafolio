@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import Cabecera from './Cabecera';
 import IconoTecnologia from './IconoTecnologia';
 import CarruselTecnologias from './CarruselTecnologias';
+import Retrato from './Retrato';
 import { PERFIL } from '../data/perfil';
 import { HABILIDADES } from '../data/tecnologias';
 import { useRevelar } from '../hooks';
@@ -18,11 +18,9 @@ function Dato({ rotulo, children, ancho = false }) {
 }
 
 export default function SobreMi() {
-  const [clicks, setClicks] = useState(0);
   const bloque = useRevelar();
   const rejilla = useRevelar({ retraso: 0.1 });
   const { t } = useIdioma();
-  const foto = clicks >= 5 ? PERFIL.gif : PERFIL.foto;
 
   return (
     <section id="sobre-mi" className="scroll-mt-24 py-[clamp(3rem,6vw,5rem)]">
@@ -79,20 +77,7 @@ export default function SobreMi() {
 
         {/* Ficha personal: el retrato manda y los datos caen debajo en celdas */}
         <aside className="grid gap-1 self-start sm:grid-cols-2 lg:grid-cols-1">
-          <figure className="relative col-span-full overflow-hidden border border-borde-fuerte">
-            <img
-              src={foto}
-              alt={PERFIL.nombre}
-              width={640}
-              height={640}
-              onClick={() => setClicks((n) => n + 1)}
-              className="aspect-square w-full cursor-pointer object-cover transition-transform duration-700 ease-suave hover:scale-[1.03]"
-            />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-fondo/70 px-4 py-3 backdrop-blur-md">
-              <p className="text-sm font-medium">{PERFIL.nombre}</p>
-              <p className="text-xs text-texto-2">{t(PERFIL.cargo)}</p>
-            </figcaption>
-          </figure>
+          <Retrato />
 
           {PERFIL.contacto.map(({ etiqueta, valor, href, ancho }, i) => (
             <Dato key={i} rotulo={t(etiqueta)} ancho={ancho}>

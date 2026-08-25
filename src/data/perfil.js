@@ -9,7 +9,10 @@ const publico = (archivo) => `${import.meta.env.BASE_URL}${archivo}`;
 export const PERFIL = {
   nombre: 'Angel Villorina',
   cargo: { es: 'Desarrollador de Aplicaciones Web', en: 'Web Application Developer' },
-  foto: publico('yo.jpg'),
+  // Rotan en el retrato, una detrás de otra con su pausa. Si alguna todavía
+  // no está en public/, el componente la descarta y sigue con las demás.
+  fotos: [publico('perfil-1.jpg'), publico('perfil-2.jpg'), publico('perfil-3.jpg')],
+  fotoRespaldo: publico('yo.jpg'),
   gif: publico('Gabino-gif.gif'),
 
   presentacion: [

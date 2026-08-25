@@ -75,8 +75,18 @@ export function useScrollSuave() {
     const destino = id === 'portada' ? 0 : document.getElementById(id);
     if (destino === null) return;
     const lenis = refLenis.current;
-    if (lenis) lenis.scrollTo(destino, { offset: id === 'portada' ? 0 : -70, duration: 1.2 });
-    else if (typeof destino === 'number') window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (lenis) {
+      // Con el menú abierto, Lenis está detenido para que el fondo no corra.
+      // Al pulsar un enlace se cierra y se navega en el mismo gesto, así que
+      // hay que reanudarlo aquí: si no, la orden de desplazarse llega antes
+      // de que se reanude y se pierde, dejando la página donde estaba.
+      lenis.start();
+      lenis.scrollTo(destino, { offset: id === 'portada' ? 0 : -70, duration: 1.2 });
+      return;
+    }
+
+    if (typeof destino === 'number') window.scrollTo({ top: 0, behavior: 'smooth' });
     else destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
